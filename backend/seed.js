@@ -7,10 +7,8 @@ async function seed() {
   await initDatabase();
 
   const hash = await bcrypt.hash('test1234', 12);
-  const SEMESTRE_L1_L2 = 'S2';
   const ANNEE = '2025-2026';
 
-  // ── Helpers ──────────────────────────────────────────
   async function insertUser(nom, prenom, email, role) {
     const r = await runQuery(
       `INSERT OR IGNORE INTO users (nom, prenom, email, password_hash, role) VALUES (?, ?, ?, ?, ?)`,
@@ -31,16 +29,6 @@ async function seed() {
     return p.id;
   }
 
-  async function insertEtu(userId, num, filiere, niveau) {
-    const r = await runQuery(
-      `INSERT OR IGNORE INTO etudiants (user_id, numero_etudiant, filiere, niveau) VALUES (?, ?, ?, ?)`,
-      [userId, num, filiere, niveau]
-    );
-    if (r.lastID) return r.lastID;
-    const e = await getOne(`SELECT id FROM etudiants WHERE user_id = ?`, [userId]);
-    return e.id;
-  }
-
   async function enroll(etuId, profId, semestre) {
     await runQuery(
       `INSERT OR IGNORE INTO enrollments (etudiant_id, professeur_id, semestre, annee_academique)
@@ -51,56 +39,55 @@ async function seed() {
 
   // ── Admin ─────────────────────────────────────────────
   await insertUser('Admin', 'Système', 'admin@smi.sn', 'admin');
-  console.log('Admin créé');
 
   // ── PROFESSEURS ───────────────────────────────────────
-  // On regroupe les profs qui enseignent plusieurs matières
-  // sous leur matière principale — l'admin pourra ajouter les autres
-
-  const uBa = await insertUser('Ba', 'Arona', 'arona.ba@smi.sn', 'professeur');
-  const uDiallo = await insertUser('Diallo', 'Mr', 'diallo@smi.sn', 'professeur');
+  const uBa          = await insertUser('Ba', 'Arona', 'arona.ba@smi.sn', 'professeur');
+  const uDiallo      = await insertUser('Diallo', 'Mr', 'diallo@smi.sn', 'professeur');
   const uDiopLibasse = await insertUser('Diop', 'Libasse', 'libasse.diop@smi.sn', 'professeur');
-  const uDiopEco = await insertUser('Diop', 'Mr', 'diop.eco@smi.sn', 'professeur');
-  const uNaelMagath = await insertUser('Nael', 'Magath', 'magath.nael@smi.sn', 'professeur');
-  const uNaelPere = await insertUser('Nael', 'Mr', 'nael@smi.sn', 'professeur');
-  const uFall = await insertUser('Fall', 'Mr', 'fall@smi.sn', 'professeur');
-  const uSow = await insertUser('Sow', 'Mr', 'sow@smi.sn', 'professeur');
-  const uKaire = await insertUser('Kairé', 'Mr', 'kaire@smi.sn', 'professeur');
-  const uCisse = await insertUser('Cissé', 'Mme', 'cisse@smi.sn', 'professeur');
-  const uFaye = await insertUser('Faye', 'Mr', 'faye@smi.sn', 'professeur');
-  const uNdiaye = await insertUser('Ndiaye', 'Mr', 'ndiaye@smi.sn', 'professeur');
-  const uDiene = await insertUser('Diene', 'Mr', 'diene@smi.sn', 'professeur');
+  const uDiopEco     = await insertUser('Diop', 'Mr', 'diop.eco@smi.sn', 'professeur');
+  const uNaelMagath  = await insertUser('Nael', 'Magath', 'magath.nael@smi.sn', 'professeur');
+  const uNaelPere    = await insertUser('Nael', 'Mr', 'nael@smi.sn', 'professeur');
+  const uFall        = await insertUser('Fall', 'Mr', 'fall@smi.sn', 'professeur');
+  const uSow         = await insertUser('Sow', 'Mr', 'sow@smi.sn', 'professeur');
+  const uKaire       = await insertUser('Kairé', 'Mr', 'kaire@smi.sn', 'professeur');
+  const uCisse       = await insertUser('Cissé', 'Mme', 'cisse@smi.sn', 'professeur');
+  const uFaye        = await insertUser('Faye', 'Mr', 'faye@smi.sn', 'professeur');
+  const uNdiaye      = await insertUser('Ndiaye', 'Mr', 'ndiaye@smi.sn', 'professeur');
+  const uDiene       = await insertUser('Diene', 'Mr', 'diene@smi.sn', 'professeur');
+  const uDiouf       = await insertUser('Diouf', 'Mr', 'diouf@smi.sn', 'professeur');
+  const uPouye       = await insertUser('Pouye', 'Mr', 'pouye@smi.sn', 'professeur');
 
   // Profils professeurs
-  const pBa           = await insertProf(uBa, 'Comptabilité Générale / Comptabilité Gestion / Fiscalité', 'Comptabilité');
-  const pDiallo       = await insertProf(uDiallo, 'Statistiques & Probabilités', 'Mathématiques');
-  const pDiopLibasse  = await insertProf(uDiopLibasse, 'HTML CSS / SIG / VBA Excel & PowerPoint', 'Informatique');
-  const pDiopEco      = await insertProf(uDiopEco, 'Économie / Microéconomie / Organisation des Entreprises', 'Économie');
-  const pNaelMagath   = await insertProf(uNaelMagath, 'Algorithme & Structure des Données / Analyse SI', 'Informatique');
-  const pNaelPere     = await insertProf(uNaelPere, 'Mathématiques Financières / Financement', 'Mathématiques');
-  const pFall         = await insertProf(uFall, 'Management / Marketing Stratégique', 'Management');
-  const pSow          = await insertProf(uSow, "Technique d'Expression Française", 'Langue');
-  const pKaire        = await insertProf(uKaire, 'Technique de Communication / Droit des Affaires', 'Droit');
-  const pCisse        = await insertProf(uCisse, 'Développement Personnel', 'Développement');
-  const pFaye         = await insertProf(uFaye, 'Comptabilité des Sociétés', 'Comptabilité');
-  const pNdiaye       = await insertProf(uNdiaye, 'Douane', 'Commerce');
-  const pDiene        = await insertProf(uDiene, 'Normalisation Qualité', 'Qualité');
+  const pBa          = await insertProf(uBa, 'Comptabilité Générale / Comptabilité Gestion / Fiscalité / Contrôle de Gestion / Analyse Financière', 'Comptabilité');
+  const pDiallo      = await insertProf(uDiallo, 'Statistiques & Probabilités / Statistiques Descriptives', 'Mathématiques');
+  const pDiopLibasse = await insertProf(uDiopLibasse, 'HTML CSS / SIG / VBA Excel & PowerPoint / Système d\'Information', 'Informatique');
+  const pDiopEco     = await insertProf(uDiopEco, 'Économie / Microéconomie / Organisation des Entreprises', 'Économie');
+  const pNaelMagath  = await insertProf(uNaelMagath, 'Algorithme & Structure des Données / Analyse SI / JavaScript / Base de Données', 'Informatique');
+  const pNaelPere    = await insertProf(uNaelPere, 'Mathématiques Financières / Financement / Organisation Comptable', 'Mathématiques');
+  const pFall        = await insertProf(uFall, 'Management / Marketing Stratégique', 'Management');
+  const pSow         = await insertProf(uSow, 'Technique d\'Expression Française', 'Langue');
+  const pKaire       = await insertProf(uKaire, 'Technique de Communication / Droit des Affaires', 'Droit');
+  const pCisse       = await insertProf(uCisse, 'Développement Personnel', 'Développement');
+  const pFaye        = await insertProf(uFaye, 'Comptabilité des Sociétés / Restructuration d\'Entreprise', 'Comptabilité');
+  const pNdiaye      = await insertProf(uNdiaye, 'Douane', 'Commerce');
+  const pDiene       = await insertProf(uDiene, 'Normalisation Qualité', 'Qualité');
+  const pDiouf       = await insertProf(uDiouf, 'Gestion des Ressources Humaines', 'Management');
+  const pPouye       = await insertProf(uPouye, 'Droit du Travail', 'Droit');
 
   console.log('Professeurs créés');
+
+  // ── CODE D\'INSCRIPTION ───────────────────────────────
+  await runQuery(
+    `INSERT OR IGNORE INTO codes_inscription (code, description, max_usage)
+     VALUES (?, ?, ?)`,
+    ['SMI-2025', 'Code d\'inscription année 2025-2026', 999]
+  );
 
   console.log('\n✓ Base de données SMI prête !');
   console.log('\nCompte admin :');
   console.log('  Admin → admin@smi.sn / test1234');
   console.log('\n⚠️  Changez le mot de passe admin après le premier login !');
   console.log('Code inscription étudiants : SMI-2025');
-  
-  // Code d'inscription par défaut
-await runQuery(
-  `INSERT OR IGNORE INTO codes_inscription (code, description, max_usage)
-   VALUES (?, ?, ?)`,
-  ['SMI-2025', "Code d'inscription année 2025-2026", 999]
-);
-console.log("Code d'inscription : SMI-2025");
 
   process.exit(0);
 }
