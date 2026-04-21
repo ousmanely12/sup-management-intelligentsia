@@ -2,9 +2,14 @@ const API = 'http://localhost:3000/api';
 
 // Afficher une alerte
 function showAlert(type, message) {
-  document.querySelectorAll('.alert').forEach(a => a.classList.remove('show'));
+  document
+    .querySelectorAll('.alert')
+    .forEach((a) => a.classList.remove('show'));
   const el = document.getElementById('alert-' + type);
-  if (el) { el.textContent = message; el.classList.add('show'); }
+  if (el) {
+    el.textContent = message;
+    el.classList.add('show');
+  }
 }
 
 // Sauvegarder la session
@@ -41,9 +46,9 @@ function redirectIfLoggedIn() {
 // Rediriger selon le rôle
 function redirectByRole(role) {
   const routes = {
-    etudiant:   '/pages/etudiant.html',
+    etudiant: '/pages/etudiant.html',
     professeur: '/pages/professeur.html',
-    admin:      '/pages/admin.html'
+    admin: '/pages/admin.html',
   };
   window.location.href = routes[role] || '/pages/login.html';
 }
@@ -81,7 +86,7 @@ if (loginForm) {
       const res = await fetch(`${API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -96,7 +101,6 @@ if (loginForm) {
       saveSession(data.token, data.user);
       showAlert('success', 'Connexion réussie ! Redirection...');
       setTimeout(() => redirectByRole(data.user.role), 800);
-
     } catch (err) {
       showAlert('error', 'Impossible de contacter le serveur.');
       btn.textContent = 'Se connecter';

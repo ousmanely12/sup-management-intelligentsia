@@ -1,51 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion — Sup Management Intelligentsia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-  <div class="login-page">
-    <div class="login-card">
-
-      <div class="login-header">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion — Sup Management Intelligentsia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="login-card">
         <div class="login-header">
-          <img src="../logo_SMI.png" alt="SMI Logo"
-           style="height:80px; width:auto; margin-bottom:1.2rem; display:block; margin-left:auto; margin-right:auto;">
-          <h1>Sup Management Intelligentsia</h1>
-          <p>Connectez-vous à votre espace</p>
-        </div>
+          <div class="login-header">
+            <img
+              src="../logo_SMI.png"
+              alt="SMI Logo"
+              style="
+                height: 80px;
+                width: auto;
+                margin-bottom: 1.2rem;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+              "
+            />
+            <h1>Sup Management Intelligentsia</h1>
+            <p>Connectez-vous à votre espace</p>
+          </div>
 
-        <div style="text-align:center; margin-top:1.2rem; font-size:13px; color:var(--gris-text);">
+          <div
+            style="
+              text-align: center;
+              margin-top: 1.2rem;
+              font-size: 13px;
+              color: var(--gris-text);
+            "
+          >
             Pas encore de compte ?
-            <a href="/pages/register.html" style="color:var(--bleu); font-weight:600; text-decoration:none;">
+            <a
+              href="/pages/register.html"
+              style="
+                color: var(--bleu);
+                font-weight: 600;
+                text-decoration: none;
+              "
+            >
               S'inscrire
             </a>
           </div>
+        </div>
+
+        <div class="alert alert-error" id="alert-error"></div>
+        <div class="alert alert-success" id="alert-success"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Adresse email</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="votre@email.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary" id="btn-login">
+            Se connecter
+          </button>
+        </form>
       </div>
-
-      <div class="alert alert-error" id="alert-error"></div>
-      <div class="alert alert-success" id="alert-success"></div>
-
-      <form id="login-form">
-        <div class="form-group">
-          <label for="email">Adresse email</label>
-          <input type="email" id="email" placeholder="votre@email.com" required autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label for="password">Mot de passe</label>
-          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn-primary" id="btn-login">
-          Se connecter
-        </button>
-      </form>
-
     </div>
-  </div>
 
-  <script src="../js/auth.js"></script>
-</body>
+    <script src="../js/auth.js"></script>
+  </body>
 </html>

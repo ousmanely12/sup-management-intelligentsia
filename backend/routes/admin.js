@@ -38,7 +38,7 @@ router.get('/stats', async (req, res) => {
       total_etudiants: total_etudiants.n,
       total_evals: total_evals.n,
       moyenne_generale: moy.moy,
-      classement
+      classement,
     });
   } catch (err) {
     console.error(err.message);
@@ -48,21 +48,23 @@ router.get('/stats', async (req, res) => {
 
 // DELETE /api/admin/inscrire
 router.delete('/inscrire', async (req, res) => {
-    try {
-      const { etudiant_id, professeur_id, semestre, annee_academique } = req.body;
-      await runQuery(
-        `DELETE FROM enrollments WHERE etudiant_id = ? AND professeur_id = ? AND semestre = ? AND annee_academique = ?`,
-        [etudiant_id, professeur_id, semestre, annee_academique]
-      );
-      res.json({ message: 'Inscription supprimée.' });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
+  try {
+    const { etudiant_id, professeur_id, semestre, annee_academique } = req.body;
+    await runQuery(
+      `DELETE FROM enrollments WHERE etudiant_id = ? AND professeur_id = ? AND semestre = ? AND annee_academique = ?`,
+      [etudiant_id, professeur_id, semestre, annee_academique]
+    );
+    res.json({ message: 'Inscription supprimée.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
 // GET /api/admin/users
 router.get('/users', async (req, res) => {
   try {
-    const users = await getAll(`SELECT id, nom, prenom, email, role, actif FROM users ORDER BY role, nom`);
+    const users = await getAll(
+      `SELECT id, nom, prenom, email, role, actif FROM users ORDER BY role, nom`
+    );
     res.json({ users });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });
@@ -72,9 +74,15 @@ router.get('/users', async (req, res) => {
 // PUT /api/admin/users/:id/toggle
 router.put('/users/:id/toggle', async (req, res) => {
   try {
-    const user = await getOne(`SELECT actif FROM users WHERE id = ?`, [req.params.id]);
-    if (!user) return res.status(404).json({ error: 'Utilisateur introuvable.' });
-    await runQuery(`UPDATE users SET actif = ? WHERE id = ?`, [user.actif ? 0 : 1, req.params.id]);
+    const user = await getOne(`SELECT actif FROM users WHERE id = ?`, [
+      req.params.id,
+    ]);
+    if (!user)
+      return res.status(404).json({ error: 'Utilisateur introuvable.' });
+    await runQuery(`UPDATE users SET actif = ? WHERE id = ?`, [
+      user.actif ? 0 : 1,
+      req.params.id,
+    ]);
     res.json({ message: 'Statut mis à jour.' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });
@@ -107,48 +115,54 @@ router.get('/professeurs', async (req, res) => {
   }
 });
 
-
 // GET /api/admin/codes
 router.get('/codes', async (req, res) => {
-    try {
-      const codes = await getAll(`SELECT * FROM codes_inscription ORDER BY created_at DESC`);
-      res.json({ codes });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
-  
-  // POST /api/admin/codes
-  router.post('/codes', async (req, res) => {
-    try {
-      const { code, description, max_usage } = req.body;
-      if (!code) return res.status(400).json({ error: 'Code requis.' });
-      await runQuery(
-        `INSERT INTO codes_inscription (code, description, max_usage) VALUES (?, ?, ?)`,
-        [code.trim().toUpperCase(), description || '', max_usage || 999]
-      );
-      res.json({ message: 'Code créé.' });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
-  
-  // PUT /api/admin/codes/:id/toggle
-  router.put('/codes/:id/toggle', async (req, res) => {
-    try {
-      const c = await getOne(`SELECT actif FROM codes_inscription WHERE id = ?`, [req.params.id]);
-      if (!c) return res.status(404).json({ error: 'Code introuvable.' });
-      await runQuery(`UPDATE codes_inscription SET actif = ? WHERE id = ?`, [c.actif ? 0 : 1, req.params.id]);
-      res.json({ message: 'Statut mis à jour.' });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
-  
-  // GET /api/admin/inscriptions
+  try {
+    const codes = await getAll(
+      `SELECT * FROM codes_inscription ORDER BY created_at DESC`
+    );
+    res.json({ codes });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// POST /api/admin/codes
+router.post('/codes', async (req, res) => {
+  try {
+    const { code, description, max_usage } = req.body;
+    if (!code) return res.status(400).json({ error: 'Code requis.' });
+    await runQuery(
+      `INSERT INTO codes_inscription (code, description, max_usage) VALUES (?, ?, ?)`,
+      [code.trim().toUpperCase(), description || '', max_usage || 999]
+    );
+    res.json({ message: 'Code créé.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// PUT /api/admin/codes/:id/toggle
+router.put('/codes/:id/toggle', async (req, res) => {
+  try {
+    const c = await getOne(`SELECT actif FROM codes_inscription WHERE id = ?`, [
+      req.params.id,
+    ]);
+    if (!c) return res.status(404).json({ error: 'Code introuvable.' });
+    await runQuery(`UPDATE codes_inscription SET actif = ? WHERE id = ?`, [
+      c.actif ? 0 : 1,
+      req.params.id,
+    ]);
+    res.json({ message: 'Statut mis à jour.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// GET /api/admin/inscriptions
 router.get('/inscriptions', async (req, res) => {
-    try {
-      const inscriptions = await getAll(`
+  try {
+    const inscriptions = await getAll(`
         SELECT
           e.id AS enrollment_id,
           u_etu.nom AS etu_nom, u_etu.prenom AS etu_prenom,
@@ -163,29 +177,30 @@ router.get('/inscriptions', async (req, res) => {
         JOIN users u_prof ON p.user_id = u_prof.id
         ORDER BY u_etu.nom, u_prof.nom
       `);
-      res.json({ inscriptions });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
-  
-  // DELETE /api/admin/inscriptions/:id
-  router.delete('/inscriptions/:id', async (req, res) => {
-    try {
-      const inscription = await getOne(
-        `SELECT id FROM enrollments WHERE id = ?`, [req.params.id]
-      );
-      if (!inscription) return res.status(404).json({ error: 'Inscription introuvable.' });
-  
-      await runQuery(`DELETE FROM enrollments WHERE id = ?`, [req.params.id]);
-      res.json({ message: 'Inscription supprimée.' });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur serveur.' });
-    }
-  });
+    res.json({ inscriptions });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
 
+// DELETE /api/admin/inscriptions/:id
+router.delete('/inscriptions/:id', async (req, res) => {
+  try {
+    const inscription = await getOne(
+      `SELECT id FROM enrollments WHERE id = ?`,
+      [req.params.id]
+    );
+    if (!inscription)
+      return res.status(404).json({ error: 'Inscription introuvable.' });
 
-  // GET /api/admin/parametres
+    await runQuery(`DELETE FROM enrollments WHERE id = ?`, [req.params.id]);
+    res.json({ message: 'Inscription supprimée.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// GET /api/admin/parametres
 router.get('/parametres', async (req, res) => {
   try {
     const params = await getAll(`SELECT * FROM parametres`);
@@ -213,14 +228,20 @@ router.put('/parametres/:cle', async (req, res) => {
 router.post('/inscrire', async (req, res) => {
   try {
     const { etudiant_id, professeur_id, semestre, annee_academique } = req.body;
-    const existant = await getOne(`
+    const existant = await getOne(
+      `
       SELECT id FROM enrollments
       WHERE etudiant_id = ? AND professeur_id = ? AND semestre = ? AND annee_academique = ?`,
-      [etudiant_id, professeur_id, semestre, annee_academique]);
-    if (existant) return res.status(409).json({ error: 'Inscription déjà existante.' });
-    await runQuery(`
+      [etudiant_id, professeur_id, semestre, annee_academique]
+    );
+    if (existant)
+      return res.status(409).json({ error: 'Inscription déjà existante.' });
+    await runQuery(
+      `
       INSERT INTO enrollments (etudiant_id, professeur_id, semestre, annee_academique)
-      VALUES (?, ?, ?, ?)`, [etudiant_id, professeur_id, semestre, annee_academique]);
+      VALUES (?, ?, ?, ?)`,
+      [etudiant_id, professeur_id, semestre, annee_academique]
+    );
     res.json({ message: 'Étudiant inscrit avec succès.' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });

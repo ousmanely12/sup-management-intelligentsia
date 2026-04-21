@@ -4,24 +4,24 @@ let semestreActuel = 'S2';
 let anneeActuelle = '2025-2026';
 
 async function chargerProfs() {
-    try {
-      const [resP, resC] = await Promise.all([
-        fetch('http://localhost:3000/api/public/professeurs'),
-        fetch('http://localhost:3000/api/public/config')
-      ]);
-      const dataP = await resP.json();
-      const dataC = await resC.json();
-  
-      profsDisponibles = dataP.professeurs || [];
-      semestreActuel = dataC.semestre_actuel || 'S2';
-      anneeActuelle = dataC.annee_academique || '2025-2026';
-  
-      console.log('Profs chargés:', profsDisponibles.length);
-    } catch (err) {
-      console.error('Erreur chargement:', err);
-      profsDisponibles = [];
-    }
+  try {
+    const [resP, resC] = await Promise.all([
+      fetch('http://localhost:3000/api/public/professeurs'),
+      fetch('http://localhost:3000/api/public/config'),
+    ]);
+    const dataP = await resP.json();
+    const dataC = await resC.json();
+
+    profsDisponibles = dataP.professeurs || [];
+    semestreActuel = dataC.semestre_actuel || 'S2';
+    anneeActuelle = dataC.annee_academique || '2025-2026';
+
+    console.log('Profs chargés:', profsDisponibles.length);
+  } catch (err) {
+    console.error('Erreur chargement:', err);
+    profsDisponibles = [];
   }
+}
 
 // Charger dès le départ
 chargerProfs();
@@ -35,7 +35,15 @@ function passerEtape2() {
   const filiere = document.getElementById('reg-filiere').value;
   const niveau = document.getElementById('reg-niveau').value;
 
-  if (!nom || !prenom || !email || !password || !numero || !filiere || !niveau) {
+  if (
+    !nom ||
+    !prenom ||
+    !email ||
+    !password ||
+    !numero ||
+    !filiere ||
+    !niveau
+  ) {
     showAlert('error', 'Veuillez remplir tous les champs.');
     return;
   }
@@ -48,11 +56,11 @@ function passerEtape2() {
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
 
-const code = document.getElementById('reg-code').value.trim();
-if (!code) {
-  showAlert('error', "Code d'inscription requis.");
-  return;
-}
+  const code = document.getElementById('reg-code').value.trim();
+  if (!code) {
+    showAlert('error', "Code d'inscription requis.");
+    return;
+  }
 
   // Recharger si vide
   if (profsDisponibles.length === 0) {
@@ -87,7 +95,7 @@ function afficherProfs() {
   profsSelectionnes.clear();
   document.getElementById('count-selectionnes').textContent = '0';
 
-  profsDisponibles.forEach(p => {
+  profsDisponibles.forEach((p) => {
     const div = document.createElement('div');
     div.style.cssText = `
       display:flex; align-items:center; gap:12px;
@@ -142,7 +150,8 @@ function toggleProf(profId, div) {
       stroke-width="2" stroke-linecap="round"/></svg>`;
   }
 
-  document.getElementById('count-selectionnes').textContent = profsSelectionnes.size;
+  document.getElementById('count-selectionnes').textContent =
+    profsSelectionnes.size;
 }
 
 async function soumettre() {
@@ -155,8 +164,6 @@ async function soumettre() {
   btn.textContent = 'Création du compte...';
   btn.disabled = true;
 
-  
-
   const body = {
     nom: document.getElementById('reg-nom').value.trim(),
     prenom: document.getElementById('reg-prenom').value.trim(),
@@ -168,15 +175,21 @@ async function soumettre() {
     professeurs: Array.from(profsSelectionnes),
     semestre: semestreActuel,
     annee_academique: anneeActuelle,
-    code_inscription: document.getElementById('reg-code').value.trim().toUpperCase()
+    code_inscription: document
+      .getElementById('reg-code')
+      .value.trim()
+      .toUpperCase(),
   };
 
   try {
-    const res = await fetch('http://localhost:3000/api/auth/register-etudiant', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    const res = await fetch(
+      'http://localhost:3000/api/auth/register-etudiant',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }
+    );
 
     const data = await res.json();
 
@@ -189,8 +202,9 @@ async function soumettre() {
 
     document.getElementById('step-2').style.display = 'none';
     showAlert('success', 'Compte créé ! Redirection vers la connexion...');
-    setTimeout(() => { window.location.href = '/pages/login.html'; }, 2000);
-
+    setTimeout(() => {
+      window.location.href = '/pages/login.html';
+    }, 2000);
   } catch (err) {
     showAlert('error', 'Erreur serveur. Réessayez.');
     btn.textContent = 'Créer mon compte';
@@ -199,7 +213,12 @@ async function soumettre() {
 }
 
 function showAlert(type, message) {
-  document.querySelectorAll('.alert').forEach(a => a.classList.remove('show'));
+  document
+    .querySelectorAll('.alert')
+    .forEach((a) => a.classList.remove('show'));
   const el = document.getElementById('alert-' + type);
-  if (el) { el.textContent = message; el.classList.add('show'); }
+  if (el) {
+    el.textContent = message;
+    el.classList.add('show');
+  }
 }

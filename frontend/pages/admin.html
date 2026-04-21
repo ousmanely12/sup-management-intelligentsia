@@ -1,342 +1,463 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espace Admin — Sup Management</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Espace Admin — Sup Management</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <img
+          src="../logo_SMI.png"
+          alt="SMI Logo"
+          style="height: 42px; width: auto; filter: brightness(0) invert(1)"
+        />
+      </div>
+      <div class="navbar-right">
+        <span class="navbar-user" id="nav-user">Chargement...</span>
+        <button
+          class="btn-logout"
+          onclick="ouvrirModalPassword()"
+          style="
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-right: 4px;
+          "
+        >
+          Mot de passe
+        </button>
+        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+      </div>
+    </nav>
 
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <img src="../logo_SMI.png" alt="SMI Logo" 
-  style="height:42px; width:auto; filter:brightness(0) invert(1);">
-    </div>
-    <div class="navbar-right">
-      <span class="navbar-user" id="nav-user">Chargement...</span>
-      <button class="btn-logout" onclick="ouvrirModalPassword()"
-        style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);margin-right:4px;">
-        Mot de passe
-      </button>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
-      
-      <!-- Modal changement mot de passe -->
-      <div class="modal-overlay" id="modal-password">
-        <div class="modal" style="max-width:420px;">
-          <div class="modal-header">
-            <h3>Changer le mot de passe</h3>
-            <button class="modal-close" onclick="fermerModalPassword()">×</button>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-error" id="pwd-alert-error"></div>
-            <div class="alert alert-success" id="pwd-alert-success"></div>
-            <div class="form-group">
-              <label>Ancien mot de passe</label>
-              <input type="password" id="pwd-ancien" placeholder="••••••••">
-            </div>
-            <div class="form-group">
-              <label>Nouveau mot de passe</label>
-              <input type="password" id="pwd-nouveau" placeholder="minimum 6 caractères">
-            </div>
-            <div class="form-group">
-              <label>Confirmer le nouveau mot de passe</label>
-              <input type="password" id="pwd-confirmer" placeholder="••••••••">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-outline" onclick="fermerModalPassword()">Annuler</button>
-            <button class="btn btn-primary" style="width:auto;" onclick="changerMotDePasse()">
-              Modifier
-            </button>
-          </div>
+    <!-- Modal changement mot de passe -->
+    <div class="modal-overlay" id="modal-password">
+      <div class="modal" style="max-width: 420px">
+        <div class="modal-header">
+          <h3>Changer le mot de passe</h3>
+          <button class="modal-close" onclick="fermerModalPassword()">×</button>
         </div>
-      </div>
-  <div class="dashboard">
-    <div class="dashboard-title">Tableau de bord administrateur</div>
-    <div class="dashboard-sub">Gestion complète de l'application</div>
-
-    <!-- Stats globales -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-val" id="stat-profs">--</div>
-        <div class="stat-label">Professeurs</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-val" id="stat-etudiants">--</div>
-        <div class="stat-label">Étudiants</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="stat-evals">--</div>
-        <div class="stat-label">Évaluations totales</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-val" id="stat-moy">--</div>
-        <div class="stat-label">Moyenne générale</div>
-      </div>
-    </div>
-
-
-    <!-- Contrôle des évaluations -->
-<div class="section-card" style="border-left: 4px solid var(--orange);">
-  <div class="section-card-header">
-    <h2>Contrôle des évaluations</h2>
-    <span class="badge" id="badge-statut-eval">Chargement...</span>
-  </div>
-  <div style="padding:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-    <div style="flex:1;">
-      <p style="font-size:14px; color:var(--gris-text); margin-bottom:8px;">
-        Quand les évaluations sont <strong>fermées</strong>, les étudiants voient les professeurs mais ne peuvent pas noter.
-        Ouvrez-les uniquement pendant la période d'évaluation.
-      </p>
-      <p style="font-size:13px; color:var(--gris-text);" id="txt-statut-eval"></p>
-    </div>
-    <button class="btn" id="btn-toggle-eval" onclick="toggleEvaluations()"
-      style="width:auto; padding:12px 24px; font-size:15px;">
-      Chargement...
-    </button>
-  </div>
-</div>
-
-    <!-- Classement des professeurs -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2>Classement des professeurs</h2>
-        <span class="badge badge-bleu">S1 — 2024-2025</span>
-      </div>
-      <div class="table-wrap">
-        <table id="table-profs">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Professeur</th>
-              <th>Matière</th>
-              <th>Évaluations</th>
-              <th>Clarté</th>
-              <th>Maîtrise</th>
-              <th>Dispo.</th>
-              <th>Supports</th>
-              <th>Ponctualité</th>
-              <th>Moyenne</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-profs">
-            <tr><td colspan="10" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Gestion utilisateurs -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2>Gestion des utilisateurs</h2>
-        <button class="btn btn-orange" onclick="ouvrirModalUser()">+ Ajouter</button>
-      </div>
-      <div class="table-wrap">
-        <table id="table-users">
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Rôle</th>
-              <th>Statut</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-users">
-            <tr><td colspan="5" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Gestion inscriptions -->
-    <!-- Gestion inscriptions -->
-<div class="section-card">
-    <div class="section-card-header">
-      <h2>Inscrire un étudiant à un professeur</h2>
-    </div>
-    <div style="padding:1.5rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
-      <div class="form-group" style="margin:0; flex:1; min-width:200px;">
-        <label>Étudiant</label>
-        <select id="sel-etudiant"></select>
-      </div>
-      <div class="form-group" style="margin:0; flex:1; min-width:200px;">
-        <label>Professeur</label>
-        <select id="sel-prof"></select>
-      </div>
-      <button class="btn btn-primary" style="width:auto;" onclick="inscrireEtudiant()">Inscrire</button>
-    </div>
-    <div id="enroll-msg" style="padding:0 1.5rem 1rem; font-size:13px;"></div>
-  </div>
-  
-  <!-- Liste des inscriptions -->
-  <div class="section-card">
-    <div class="section-card-header">
-      <h2>Inscriptions actuelles</h2>
-      <button class="btn btn-outline" onclick="chargerInscriptions()">Actualiser</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Étudiant</th>
-            <th>Filière</th>
-            <th>Niveau</th>
-            <th>Professeurs inscrits</th>
-            <th>Semestre</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-inscriptions">
-          <tr><td colspan="5" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-    <!-- Gestion codes d'inscription -->
-<div class="section-card">
-    <div class="section-card-header">
-      <h2>Codes d'inscription</h2>
-      <button class="btn btn-orange" onclick="genererCode()">+ Nouveau code</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Utilisations</th>
-            <th>Statut</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-codes">
-          <tr><td colspan="5" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  </div>
-
-  <!-- Modal ajout utilisateur -->
-  <div class="modal-overlay" id="modal-user">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Ajouter un utilisateur</h3>
-        <button class="modal-close" onclick="fermerModalUser()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-error" id="modal-user-error"></div>
-        <div class="alert alert-success" id="modal-user-success"></div>
-
-        <div class="form-group">
-          <label>Rôle</label>
-          <select id="new-role" onchange="toggleChampsRole()">
-            <option value="etudiant">Étudiant</option>
-            <option value="professeur">Professeur</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="modal-body">
+          <div class="alert alert-error" id="pwd-alert-error"></div>
+          <div class="alert alert-success" id="pwd-alert-success"></div>
           <div class="form-group">
-            <label>Nom</label>
-            <input type="text" id="new-nom" placeholder="Diallo">
+            <label>Ancien mot de passe</label>
+            <input type="password" id="pwd-ancien" placeholder="••••••••" />
           </div>
           <div class="form-group">
-            <label>Prénom</label>
-            <input type="text" id="new-prenom" placeholder="Mamadou">
+            <label>Nouveau mot de passe</label>
+            <input
+              type="password"
+              id="pwd-nouveau"
+              placeholder="minimum 6 caractères"
+            />
+          </div>
+          <div class="form-group">
+            <label>Confirmer le nouveau mot de passe</label>
+            <input type="password" id="pwd-confirmer" placeholder="••••••••" />
           </div>
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="new-email" placeholder="email@sup-management.sn">
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="fermerModalPassword()">
+            Annuler
+          </button>
+          <button
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="changerMotDePasse()"
+          >
+            Modifier
+          </button>
         </div>
-        <div class="form-group">
-          <label>Mot de passe</label>
-          <input type="password" id="new-password" placeholder="minimum 6 caractères">
-        </div>
+      </div>
+    </div>
+    <div class="dashboard">
+      <div class="dashboard-title">Tableau de bord administrateur</div>
+      <div class="dashboard-sub">Gestion complète de l'application</div>
 
-        <!-- Champs professeur -->
-        <div id="champs-prof">
-          <div class="form-group">
-            <label>Matière enseignée</label>
-            <input type="text" id="new-matiere" placeholder="Management Stratégique">
-          </div>
-          <div class="form-group">
-            <label>Département</label>
-            <input type="text" id="new-departement" placeholder="Management">
-          </div>
+      <!-- Stats globales -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-profs">--</div>
+          <div class="stat-label">Professeurs</div>
         </div>
+        <div class="stat-card orange">
+          <div class="stat-val" id="stat-etudiants">--</div>
+          <div class="stat-label">Étudiants</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-evals">--</div>
+          <div class="stat-label">Évaluations totales</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-val" id="stat-moy">--</div>
+          <div class="stat-label">Moyenne générale</div>
+        </div>
+      </div>
 
-        <!-- Champs étudiant -->
-        <div id="champs-etudiant" style="display:none;">
-          <div class="form-group">
-            <label>Numéro étudiant</label>
-            <input type="text" id="new-numero" placeholder="ETU-2024-003">
+      <!-- Contrôle des évaluations -->
+      <div class="section-card" style="border-left: 4px solid var(--orange)">
+        <div class="section-card-header">
+          <h2>Contrôle des évaluations</h2>
+          <span class="badge" id="badge-statut-eval">Chargement...</span>
+        </div>
+        <div
+          style="
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+          "
+        >
+          <div style="flex: 1">
+            <p
+              style="
+                font-size: 14px;
+                color: var(--gris-text);
+                margin-bottom: 8px;
+              "
+            >
+              Quand les évaluations sont <strong>fermées</strong>, les étudiants
+              voient les professeurs mais ne peuvent pas noter. Ouvrez-les
+              uniquement pendant la période d'évaluation.
+            </p>
+            <p
+              style="font-size: 13px; color: var(--gris-text)"
+              id="txt-statut-eval"
+            ></p>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button
+            class="btn"
+            id="btn-toggle-eval"
+            onclick="toggleEvaluations()"
+            style="width: auto; padding: 12px 24px; font-size: 15px"
+          >
+            Chargement...
+          </button>
+        </div>
+      </div>
+
+      <!-- Classement des professeurs -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Classement des professeurs</h2>
+          <span class="badge badge-bleu">S1 — 2024-2025</span>
+        </div>
+        <div class="table-wrap">
+          <table id="table-profs">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Professeur</th>
+                <th>Matière</th>
+                <th>Évaluations</th>
+                <th>Clarté</th>
+                <th>Maîtrise</th>
+                <th>Dispo.</th>
+                <th>Supports</th>
+                <th>Ponctualité</th>
+                <th>Moyenne</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-profs">
+              <tr>
+                <td
+                  colspan="10"
+                  style="text-align: center; color: var(--gris-text)"
+                >
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gestion utilisateurs -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Gestion des utilisateurs</h2>
+          <button class="btn btn-orange" onclick="ouvrirModalUser()">
+            + Ajouter
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table id="table-users">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-users">
+              <tr>
+                <td
+                  colspan="5"
+                  style="text-align: center; color: var(--gris-text)"
+                >
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gestion inscriptions -->
+      <!-- Gestion inscriptions -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Inscrire un étudiant à un professeur</h2>
+        </div>
+        <div
+          style="
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+          "
+        >
+          <div class="form-group" style="margin: 0; flex: 1; min-width: 200px">
+            <label>Étudiant</label>
+            <select id="sel-etudiant"></select>
+          </div>
+          <div class="form-group" style="margin: 0; flex: 1; min-width: 200px">
+            <label>Professeur</label>
+            <select id="sel-prof"></select>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="inscrireEtudiant()"
+          >
+            Inscrire
+          </button>
+        </div>
+        <div
+          id="enroll-msg"
+          style="padding: 0 1.5rem 1rem; font-size: 13px"
+        ></div>
+      </div>
+
+      <!-- Liste des inscriptions -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Inscriptions actuelles</h2>
+          <button class="btn btn-outline" onclick="chargerInscriptions()">
+            Actualiser
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Étudiant</th>
+                <th>Filière</th>
+                <th>Niveau</th>
+                <th>Professeurs inscrits</th>
+                <th>Semestre</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-inscriptions">
+              <tr>
+                <td
+                  colspan="5"
+                  style="text-align: center; color: var(--gris-text)"
+                >
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gestion codes d'inscription -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Codes d'inscription</h2>
+          <button class="btn btn-orange" onclick="genererCode()">
+            + Nouveau code
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Utilisations</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-codes">
+              <tr>
+                <td
+                  colspan="5"
+                  style="text-align: center; color: var(--gris-text)"
+                >
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal ajout utilisateur -->
+    <div class="modal-overlay" id="modal-user">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Ajouter un utilisateur</h3>
+          <button class="modal-close" onclick="fermerModalUser()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-error" id="modal-user-error"></div>
+          <div class="alert alert-success" id="modal-user-success"></div>
+
+          <div class="form-group">
+            <label>Rôle</label>
+            <select id="new-role" onchange="toggleChampsRole()">
+              <option value="etudiant">Étudiant</option>
+              <option value="professeur">Professeur</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
             <div class="form-group">
-              <label>Filière</label>
-              <input type="text" id="new-filiere" placeholder="Management">
+              <label>Nom</label>
+              <input type="text" id="new-nom" placeholder="Diallo" />
             </div>
             <div class="form-group">
-              <label>Niveau</label>
-              <input type="text" id="new-niveau" placeholder="Licence 3">
+              <label>Prénom</label>
+              <input type="text" id="new-prenom" placeholder="Mamadou" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              id="new-email"
+              placeholder="email@sup-management.sn"
+            />
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input
+              type="password"
+              id="new-password"
+              placeholder="minimum 6 caractères"
+            />
+          </div>
+
+          <!-- Champs professeur -->
+          <div id="champs-prof">
+            <div class="form-group">
+              <label>Matière enseignée</label>
+              <input
+                type="text"
+                id="new-matiere"
+                placeholder="Management Stratégique"
+              />
+            </div>
+            <div class="form-group">
+              <label>Département</label>
+              <input
+                type="text"
+                id="new-departement"
+                placeholder="Management"
+              />
+            </div>
+          </div>
+
+          <!-- Champs étudiant -->
+          <div id="champs-etudiant" style="display: none">
+            <div class="form-group">
+              <label>Numéro étudiant</label>
+              <input type="text" id="new-numero" placeholder="ETU-2024-003" />
+            </div>
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+            >
+              <div class="form-group">
+                <label>Filière</label>
+                <input type="text" id="new-filiere" placeholder="Management" />
+              </div>
+              <div class="form-group">
+                <label>Niveau</label>
+                <input type="text" id="new-niveau" placeholder="Licence 3" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="fermerModalUser()">Annuler</button>
-        <button class="btn btn-primary" style="width:auto;" onclick="creerUtilisateur()">Créer</button>
-      </div>
-    </div>
-  </div>
-
-
-
-  <!-- Modal modifier utilisateur -->
-<div class="modal-overlay" id="modal-edit-user">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <h3>Modifier l'utilisateur</h3>
-      <button class="modal-close" onclick="fermerModalEdit()">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="alert alert-error" id="edit-alert-error"></div>
-      <div class="alert alert-success" id="edit-alert-success"></div>
-      <input type="hidden" id="edit-user-id">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div class="form-group">
-          <label>Nom</label>
-          <input type="text" id="edit-nom">
-        </div>
-        <div class="form-group">
-          <label>Prénom</label>
-          <input type="text" id="edit-prenom">
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="fermerModalUser()">
+            Annuler
+          </button>
+          <button
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="creerUtilisateur()"
+          >
+            Créer
+          </button>
         </div>
       </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="edit-email">
+    </div>
+
+    <!-- Modal modifier utilisateur -->
+    <div class="modal-overlay" id="modal-edit-user">
+      <div class="modal" style="max-width: 420px">
+        <div class="modal-header">
+          <h3>Modifier l'utilisateur</h3>
+          <button class="modal-close" onclick="fermerModalEdit()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-error" id="edit-alert-error"></div>
+          <div class="alert alert-success" id="edit-alert-success"></div>
+          <input type="hidden" id="edit-user-id" />
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" id="edit-nom" />
+            </div>
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" id="edit-prenom" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="edit-email" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="fermerModalEdit()">
+            Annuler
+          </button>
+          <button
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="sauvegarderUser()"
+          >
+            Sauvegarder
+          </button>
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="fermerModalEdit()">Annuler</button>
-      <button class="btn btn-primary" style="width:auto;" onclick="sauvegarderUser()">
-        Sauvegarder
-      </button>
-    </div>
-  </div>
-</div>
 
-  <script src="../js/auth.js"></script>
-  <script src="../js/admin.js"></script>
-  <script src="../js/password.js"></script>
-</body>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/password.js"></script>
+  </body>
 </html>

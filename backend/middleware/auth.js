@@ -26,7 +26,9 @@ function requireRole(...roles) {
       return res.status(401).json({ error: 'Non authentifié.' });
     }
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Accès interdit. Rôle insuffisant.' });
+      return res
+        .status(403)
+        .json({ error: 'Accès interdit. Rôle insuffisant.' });
     }
     next();
   };

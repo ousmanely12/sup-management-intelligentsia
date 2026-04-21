@@ -21,11 +21,11 @@ function initDatabase() {
     const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
     const statements = schema
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
     db.serialize(() => {
-      statements.forEach(stmt => {
+      statements.forEach((stmt) => {
         db.run(stmt, (err) => {
           if (err && !err.message.includes('already exists')) {
             console.error('Erreur schema:', err.message);
@@ -43,7 +43,7 @@ function getDatabase() {
 
 function runQuery(sql, params = []) {
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
+    db.run(sql, params, function (err) {
       if (err) reject(err);
       else resolve({ lastID: this.lastID, changes: this.changes });
     });

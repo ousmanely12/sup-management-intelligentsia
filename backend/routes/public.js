@@ -27,9 +27,9 @@ router.get('/config', async (req, res) => {
       'Management',
       'Commerce International',
       'Informatique de Gestion',
-      'Transport & Logistique'
+      'Transport & Logistique',
     ],
-    niveaux: ['Licence 1', 'Licence 2', 'Licence 3']
+    niveaux: ['Licence 1', 'Licence 2', 'Licence 3'],
   });
 });
 
