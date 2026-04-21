@@ -83,6 +83,8 @@ router.post('/evaluer', async (req, res) => {
       note_supports, note_ponctualite, commentaire
     } = req.body;
 
+    
+
     // Validation des notes
 const notesValides = [note_clarte, note_maitrise, note_disponibilite, note_supports, note_ponctualite];
 for (const note of notesValides) {

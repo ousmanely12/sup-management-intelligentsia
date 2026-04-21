@@ -68,6 +68,17 @@ body {
   letter-spacing: 0.2px;
 }
 
+.navbar-brand img {
+  height: 42px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  transition: opacity 0.2s;
+}
+
+.navbar-brand img:hover {
+  opacity: 0.85;
+}
+
 .navbar-logo {
   width: 38px;
   height: 38px;

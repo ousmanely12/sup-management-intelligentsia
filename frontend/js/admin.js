@@ -7,6 +7,7 @@ if (user) {
   chargerSelectsInscription();
   chargerCodes();
   chargerInscriptions();
+  chargerStatutEval();
 }
 
 
@@ -61,6 +62,7 @@ async function chargerDashboard() {
   }
 }
 
+
 async function chargerUtilisateurs() {
   try {
     const res = await fetchAdmin('/users');
@@ -81,7 +83,11 @@ async function chargerUtilisateurs() {
             ${u.actif ? 'Actif' : 'Inactif'}
           </span>
         </td>
-        <td>
+        <td style="display:flex; gap:6px;">
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;"
+            onclick="ouvrirModalEdit(${u.id}, '${u.nom}', '${u.prenom}', '${u.email}')">
+            Modifier
+          </button>
           <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;"
             onclick="toggleUser(${u.id}, ${u.actif})">
             ${u.actif ? 'Désactiver' : 'Activer'}
@@ -265,30 +271,54 @@ async function chargerCodes() {
       const tbody = document.getElementById('tbody-inscriptions');
   
       if (!data.inscriptions || data.inscriptions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gris-text);">Aucune inscription.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--gris-text);">Aucune inscription.</td></tr>';
         return;
       }
   
-      tbody.innerHTML = data.inscriptions.map(i => `
+      // Regrouper par étudiant
+      const grouped = {};
+      data.inscriptions.forEach(i => {
+        const key = i.etu_prenom + ' ' + i.etu_nom;
+        if (!grouped[key]) {
+          grouped[key] = {
+            nom: i.etu_prenom + ' ' + i.etu_nom,
+            filiere: i.filiere,
+            niveau: i.niveau,
+            profs: []
+          };
+        }
+        grouped[key].profs.push({
+          id: i.enrollment_id,
+          nom: i.prof_prenom + ' ' + i.prof_nom,
+          matiere: i.matiere,
+          semestre: i.semestre + ' ' + i.annee_academique
+        });
+      });
+  
+      tbody.innerHTML = Object.values(grouped).map(e => `
         <tr>
-          <td><strong>${i.etu_prenom} ${i.etu_nom}</strong></td>
-          <td style="font-size:13px;">${i.filiere}</td>
-          <td><span class="badge badge-bleu">${i.niveau}</span></td>
-          <td>${i.prof_prenom} ${i.prof_nom}</td>
-          <td style="font-size:13px;">${i.matiere}</td>
-          <td><span class="badge badge-gris">${i.semestre} ${i.annee_academique}</span></td>
+          <td><strong>${e.nom}</strong></td>
+          <td style="font-size:13px;">${e.filiere}</td>
+          <td><span class="badge badge-bleu">${e.niveau}</span></td>
           <td>
-            <button class="btn" style="padding:4px 10px;font-size:12px;color:var(--rouge);
-              border:1px solid var(--rouge);border-radius:6px;background:transparent;cursor:pointer;"
-              onclick="supprimerInscription(${i.enrollment_id})">
-              Supprimer
-            </button>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${e.profs.map(p => `
+                <span class="badge badge-gris" style="display:inline-flex;align-items:center;gap:4px;">
+                  ${p.nom}
+                  <span onclick="supprimerInscription(${p.id})"
+                    style="cursor:pointer;color:var(--rouge);font-weight:700;font-size:13px;line-height:1;">×</span>
+                </span>`).join('')}
+            </div>
           </td>
+          <td style="font-size:12px;color:var(--gris-text);">${e.profs[0].semestre}</td>
         </tr>`).join('');
+  
     } catch (err) {
       console.error('Erreur inscriptions:', err);
     }
   }
+
+
   
   async function supprimerInscription(enrollmentId) {
     if (!confirm('Supprimer cette inscription ?')) return;
@@ -303,5 +333,111 @@ async function chargerCodes() {
       }
     } catch (err) {
       alert('Erreur serveur.');
+    }
+  }
+
+  async function chargerStatutEval() {
+    try {
+      const res = await fetch('http://localhost:3000/api/public/statut-evaluations');
+      const data = await res.json();
+      mettreAJourStatutEval(data.ouvertes);
+    } catch (err) {
+      console.error('Erreur statut eval:', err);
+    }
+  }
+  
+  function mettreAJourStatutEval(ouvertes) {
+    const badge = document.getElementById('badge-statut-eval');
+    const btn = document.getElementById('btn-toggle-eval');
+    const txt = document.getElementById('txt-statut-eval');
+  
+    if (ouvertes) {
+      badge.className = 'badge badge-vert';
+      badge.textContent = 'Évaluations OUVERTES';
+      btn.className = 'btn btn-outline';
+      btn.style.cssText = 'width:auto;padding:12px 24px;font-size:15px;color:var(--rouge);border-color:var(--rouge);';
+      btn.textContent = 'Fermer les évaluations';
+      txt.textContent = 'Les étudiants peuvent noter leurs professeurs en ce moment.';
+    } else {
+      badge.className = 'badge badge-gris';
+      badge.textContent = 'Évaluations FERMÉES';
+      btn.className = 'btn btn-primary';
+      btn.style.cssText = 'width:auto;padding:12px 24px;font-size:15px;';
+      btn.textContent = 'Ouvrir les évaluations';
+      txt.textContent = 'Les étudiants ne peuvent pas noter pour le moment.';
+    }
+  }
+  
+  async function toggleEvaluations() {
+    try {
+      const res = await fetch('http://localhost:3000/api/public/statut-evaluations');
+      const data = await res.json();
+      const nouvelEtat = !data.ouvertes;
+  
+      const confirmation = confirm(
+        nouvelEtat
+          ? '⚠️ Ouvrir les évaluations ?\nLes étudiants pourront noter leurs professeurs.'
+          : '⚠️ Fermer les évaluations ?\nLes étudiants ne pourront plus noter.'
+      );
+  
+      if (!confirmation) return;
+  
+      await fetchAdmin('/parametres/evaluations_ouvertes', {
+        method: 'PUT',
+        body: JSON.stringify({ valeur: String(nouvelEtat) })
+      });
+  
+      mettreAJourStatutEval(nouvelEtat);
+    } catch (err) {
+      console.error('Erreur toggle eval:', err);
+    }
+  }
+  function ouvrirModalEdit(id, nom, prenom, email) {
+    document.getElementById('edit-user-id').value = id;
+    document.getElementById('edit-nom').value = nom;
+    document.getElementById('edit-prenom').value = prenom;
+    document.getElementById('edit-email').value = email;
+    document.getElementById('edit-alert-error').classList.remove('show');
+    document.getElementById('edit-alert-success').classList.remove('show');
+    document.getElementById('modal-edit-user').classList.add('open');
+  }
+  
+  function fermerModalEdit() {
+    document.getElementById('modal-edit-user').classList.remove('open');
+  }
+  
+  async function sauvegarderUser() {
+    const id = document.getElementById('edit-user-id').value;
+    const nom = document.getElementById('edit-nom').value.trim();
+    const prenom = document.getElementById('edit-prenom').value.trim();
+    const email = document.getElementById('edit-email').value.trim();
+  
+    const errEl = document.getElementById('edit-alert-error');
+    const sucEl = document.getElementById('edit-alert-success');
+    errEl.classList.remove('show');
+    sucEl.classList.remove('show');
+  
+    try {
+      const res = await fetchAdmin('/users/' + id, {
+        method: 'PUT',
+        body: JSON.stringify({ nom, prenom, email })
+      });
+      const data = await res.json();
+  
+      if (!res.ok) {
+        errEl.textContent = data.error;
+        errEl.classList.add('show');
+        return;
+      }
+  
+      sucEl.textContent = 'Mis à jour avec succès !';
+      sucEl.classList.add('show');
+      setTimeout(() => {
+        fermerModalEdit();
+        chargerUtilisateurs();
+      }, 1000);
+    } catch (err) {
+      errEl.textContent = 'Erreur serveur.';
+      errEl.classList.add('show');
     }
   }

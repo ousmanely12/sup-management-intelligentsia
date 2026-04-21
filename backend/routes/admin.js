@@ -184,6 +184,31 @@ router.get('/inscriptions', async (req, res) => {
     }
   });
 
+
+  // GET /api/admin/parametres
+router.get('/parametres', async (req, res) => {
+  try {
+    const params = await getAll(`SELECT * FROM parametres`);
+    res.json({ parametres: params });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// PUT /api/admin/parametres/:cle
+router.put('/parametres/:cle', async (req, res) => {
+  try {
+    const { valeur } = req.body;
+    await runQuery(
+      `UPDATE parametres SET valeur = ?, updated_at = CURRENT_TIMESTAMP WHERE cle = ?`,
+      [valeur, req.params.cle]
+    );
+    res.json({ message: 'Paramètre mis à jour.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
 // POST /api/admin/inscrire
 router.post('/inscrire', async (req, res) => {
   try {
@@ -197,6 +222,39 @@ router.post('/inscrire', async (req, res) => {
       INSERT INTO enrollments (etudiant_id, professeur_id, semestre, annee_academique)
       VALUES (?, ?, ?, ?)`, [etudiant_id, professeur_id, semestre, annee_academique]);
     res.json({ message: 'Étudiant inscrit avec succès.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// PUT /api/admin/users/:id — modifier email et nom
+router.put('/users/:id', async (req, res) => {
+  try {
+    const { nom, prenom, email } = req.body;
+
+    if (!nom || !prenom || !email) {
+      return res.status(400).json({ error: 'Nom, prénom et email requis.' });
+    }
+
+    if (email.length > 100) {
+      return res.status(400).json({ error: 'Email trop long.' });
+    }
+
+    // Vérifier si l'email est déjà utilisé par un autre utilisateur
+    const existing = await getOne(
+      `SELECT id FROM users WHERE email = ? AND id != ?`,
+      [email.toLowerCase().trim(), req.params.id]
+    );
+    if (existing) {
+      return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
+    }
+
+    await runQuery(
+      `UPDATE users SET nom = ?, prenom = ?, email = ? WHERE id = ?`,
+      [nom.trim(), prenom.trim(), email.toLowerCase().trim(), req.params.id]
+    );
+
+    res.json({ message: 'Utilisateur mis à jour.' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });
   }

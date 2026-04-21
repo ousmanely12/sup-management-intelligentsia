@@ -89,6 +89,14 @@ async function seed() {
   console.log('\n⚠️  Changez le mot de passe admin après le premier login !');
   console.log('Code inscription étudiants : SMI-2025');
 
+  // Paramètre ouverture/fermeture des évaluations
+await runQuery(
+  `INSERT OR IGNORE INTO parametres (cle, valeur, description)
+   VALUES (?, ?, ?)`,
+  ['evaluations_ouvertes', 'false', 'Contrôle ouverture des évaluations']
+);
+console.log('Paramètres créés — évaluations fermées par défaut');
+
   process.exit(0);
 }
 

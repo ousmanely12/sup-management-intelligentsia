@@ -33,4 +33,16 @@ router.get('/config', async (req, res) => {
   });
 });
 
+router.get('/statut-evaluations', async (req, res) => {
+  try {
+    const { getOne } = require('../config/database');
+    const param = await getOne(
+      `SELECT valeur FROM parametres WHERE cle = 'evaluations_ouvertes'`
+    );
+    res.json({ ouvertes: param ? param.valeur === 'true' : false });
+  } catch (err) {
+    res.status(500).json({ ouvertes: false });
+  }
+});
+
 module.exports = router;

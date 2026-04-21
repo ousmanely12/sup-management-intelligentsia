@@ -72,6 +72,14 @@ CREATE TABLE IF NOT EXISTS codes_inscription (
   max_usage INTEGER DEFAULT 999,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS parametres (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cle TEXT UNIQUE NOT NULL,
+  valeur TEXT NOT NULL,
+  description TEXT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 -- Index pour accélérer les requêtes fréquentes
 CREATE INDEX IF NOT EXISTS idx_evaluations_prof ON evaluations(professeur_id);
 CREATE INDEX IF NOT EXISTS idx_enrollments_etudiant ON enrollments(etudiant_id);

@@ -8,20 +8,20 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="navbar-brand">
-          <div class="navbar-logo">SUP<br>MGT</div>
-          <span>Sup Management Intelligentsia</span>
-        </div>
-        <div class="navbar-right">
-          <span class="navbar-user" id="nav-user">Chargement...</span>
-          <button class="btn-logout" onclick="ouvrirModalPassword()" 
-            style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);margin-right:4px;">
-            Mot de passe
-          </button>
-          <button class="btn-logout" onclick="logout()">Déconnexion</button>
-        </div>
-      </nav>
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="../logo_SMI.png" alt="SMI Logo" 
+  style="height:42px; width:auto; filter:brightness(0) invert(1);">
+    </div>
+    <div class="navbar-right">
+      <span class="navbar-user" id="nav-user">Chargement...</span>
+      <button class="btn-logout" onclick="ouvrirModalPassword()"
+        style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);margin-right:4px;">
+        Mot de passe
+      </button>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
       
       <!-- Modal changement mot de passe -->
       <div class="modal-overlay" id="modal-password">
@@ -77,6 +77,28 @@
         <div class="stat-label">Moyenne générale</div>
       </div>
     </div>
+
+
+    <!-- Contrôle des évaluations -->
+<div class="section-card" style="border-left: 4px solid var(--orange);">
+  <div class="section-card-header">
+    <h2>Contrôle des évaluations</h2>
+    <span class="badge" id="badge-statut-eval">Chargement...</span>
+  </div>
+  <div style="padding:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+    <div style="flex:1;">
+      <p style="font-size:14px; color:var(--gris-text); margin-bottom:8px;">
+        Quand les évaluations sont <strong>fermées</strong>, les étudiants voient les professeurs mais ne peuvent pas noter.
+        Ouvrez-les uniquement pendant la période d'évaluation.
+      </p>
+      <p style="font-size:13px; color:var(--gris-text);" id="txt-statut-eval"></p>
+    </div>
+    <button class="btn" id="btn-toggle-eval" onclick="toggleEvaluations()"
+      style="width:auto; padding:12px 24px; font-size:15px;">
+      Chargement...
+    </button>
+  </div>
+</div>
 
     <!-- Classement des professeurs -->
     <div class="section-card">
@@ -164,14 +186,12 @@
             <th>Étudiant</th>
             <th>Filière</th>
             <th>Niveau</th>
-            <th>Professeur</th>
-            <th>Matière</th>
+            <th>Professeurs inscrits</th>
             <th>Semestre</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody id="tbody-inscriptions">
-          <tr><td colspan="7" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
+          <tr><td colspan="5" style="text-align:center;color:var(--gris-text);">Chargement...</td></tr>
         </tbody>
       </table>
     </div>
@@ -277,6 +297,43 @@
       </div>
     </div>
   </div>
+
+
+
+  <!-- Modal modifier utilisateur -->
+<div class="modal-overlay" id="modal-edit-user">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>Modifier l'utilisateur</h3>
+      <button class="modal-close" onclick="fermerModalEdit()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" id="edit-alert-error"></div>
+      <div class="alert alert-success" id="edit-alert-success"></div>
+      <input type="hidden" id="edit-user-id">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" id="edit-nom">
+        </div>
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" id="edit-prenom">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="edit-email">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fermerModalEdit()">Annuler</button>
+      <button class="btn btn-primary" style="width:auto;" onclick="sauvegarderUser()">
+        Sauvegarder
+      </button>
+    </div>
+  </div>
+</div>
 
   <script src="../js/auth.js"></script>
   <script src="../js/admin.js"></script>
