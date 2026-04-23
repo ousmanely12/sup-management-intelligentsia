@@ -1,71 +1,114 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+const { Pool } = require('pg');
 
-const DB_PATH = path.join(__dirname, '..', 'supmanagement.db');
-const SCHEMA_PATH = path.join(__dirname, '..', 'schema.sql');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
-let db;
+async function initDatabase() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        nom TEXT NOT NULL,
+        prenom TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL CHECK(role IN ('etudiant', 'professeur', 'admin')),
+        actif INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-function initDatabase() {
-  return new Promise((resolve, reject) => {
-    db = new sqlite3.Database(DB_PATH, (err) => {
-      if (err) return reject(err);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Base de données connectée.');
-      }
-    });
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS professeurs (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        matiere TEXT NOT NULL,
+        departement TEXT
+      )
+    `);
 
-    db.run('PRAGMA foreign_keys = ON');
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS etudiants (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        numero_etudiant TEXT UNIQUE NOT NULL,
+        filiere TEXT NOT NULL,
+        niveau TEXT NOT NULL
+      )
+    `);
 
-    const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
-    const statements = schema
-      .split(';')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS enrollments (
+        id SERIAL PRIMARY KEY,
+        etudiant_id INTEGER NOT NULL REFERENCES etudiants(id) ON DELETE CASCADE,
+        professeur_id INTEGER NOT NULL REFERENCES professeurs(id) ON DELETE CASCADE,
+        semestre TEXT NOT NULL,
+        annee_academique TEXT NOT NULL,
+        UNIQUE(etudiant_id, professeur_id, semestre, annee_academique)
+      )
+    `);
 
-    db.serialize(() => {
-      statements.forEach((stmt) => {
-        db.run(stmt, (err) => {
-          if (err && !err.message.includes('already exists')) {
-            console.error('Erreur schema:', err.message);
-          }
-        });
-      });
-      db.run('SELECT 1', () => resolve(db));
-    });
-  });
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS evaluations (
+        id SERIAL PRIMARY KEY,
+        professeur_id INTEGER NOT NULL REFERENCES professeurs(id) ON DELETE CASCADE,
+        semestre TEXT NOT NULL,
+        annee_academique TEXT NOT NULL,
+        etudiant_hash TEXT NOT NULL,
+        note_clarte INTEGER NOT NULL CHECK(note_clarte BETWEEN 1 AND 5),
+        note_maitrise INTEGER NOT NULL CHECK(note_maitrise BETWEEN 1 AND 5),
+        note_disponibilite INTEGER NOT NULL CHECK(note_disponibilite BETWEEN 1 AND 5),
+        note_supports INTEGER NOT NULL CHECK(note_supports BETWEEN 1 AND 5),
+        note_ponctualite INTEGER NOT NULL CHECK(note_ponctualite BETWEEN 1 AND 5),
+        commentaire TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(professeur_id, etudiant_hash, semestre, annee_academique)
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS codes_inscription (
+        id SERIAL PRIMARY KEY,
+        code TEXT UNIQUE NOT NULL,
+        description TEXT,
+        actif INTEGER DEFAULT 1,
+        usage_count INTEGER DEFAULT 0,
+        max_usage INTEGER DEFAULT 999,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    console.log('Base de données PostgreSQL initialisée.');
+  } finally {
+    client.release();
+  }
 }
 
-function getDatabase() {
-  return db;
+async function runQuery(sql, params = []) {
+  let paramIndex = 0;
+  const convertedSql = sql.replace(/\?/g, () => '$' + (++paramIndex));
+  const result = await pool.query(convertedSql, params);
+  return {
+    lastID: result.rows[0]?.id || null,
+    changes: result.rowCount
+  };
 }
 
-function runQuery(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) reject(err);
-      else resolve({ lastID: this.lastID, changes: this.changes });
-    });
-  });
+async function getOne(sql, params = []) {
+  let paramIndex = 0;
+  const convertedSql = sql.replace(/\?/g, () => '$' + (++paramIndex));
+  const result = await pool.query(convertedSql, params);
+  return result.rows[0] || null;
 }
 
-function getOne(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
+async function getAll(sql, params = []) {
+  let paramIndex = 0;
+  const convertedSql = sql.replace(/\?/g, () => '$' + (++paramIndex));
+  const result = await pool.query(convertedSql, params);
+  return result.rows;
 }
-
-function getAll(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-}
-
-module.exports = { initDatabase, getDatabase, runQuery, getOne, getAll };
+module.exports = { initDatabase, runQuery, getOne, getAll };

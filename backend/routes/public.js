@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAll } = require('../config/database');
+const { getAll, getOne } = require('../config/database');
 
 router.get('/professeurs', async (req, res) => {
   try {
@@ -27,21 +27,20 @@ router.get('/config', async (req, res) => {
       'Management',
       'Commerce International',
       'Informatique de Gestion',
-      'Transport & Logistique',
+      'Transport & Logistique'
     ],
-    niveaux: ['Licence 1', 'Licence 2', 'Licence 3'],
+    niveaux: ['Licence 1', 'Licence 2', 'Licence 3']
   });
 });
 
 router.get('/statut-evaluations', async (req, res) => {
   try {
-    const { getOne } = require('../config/database');
-    const param = await getOne(
-      `SELECT valeur FROM parametres WHERE cle = 'evaluations_ouvertes'`
+    const config = await getOne(
+      `SELECT actif FROM codes_inscription WHERE code = 'EVAL_STATUS'`
     );
-    res.json({ ouvertes: param ? param.valeur === 'true' : false });
+    res.json({ ouvert: config ? config.actif : 1 });
   } catch (err) {
-    res.status(500).json({ ouvertes: false });
+    res.status(500).json({ error: 'Erreur serveur.' });
   }
 });
 

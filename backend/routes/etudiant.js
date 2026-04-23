@@ -9,14 +9,12 @@ const HASH_SALT = process.env.JWT_SECRET || 'sup_management_secret_key_2024';
 router.use(verifyToken);
 router.use(requireRole('etudiant'));
 
-// GET /api/etudiant/professeurs — tous les profs avec statut
 router.get('/professeurs', async (req, res) => {
   try {
     const userId = req.user.userId;
 
     const etudiant = await getOne(
-      `SELECT id FROM etudiants WHERE user_id = ?`,
-      [userId]
+      `SELECT id FROM etudiants WHERE user_id = $1`, [userId]
     );
 
     if (!etudiant) {
@@ -25,8 +23,7 @@ router.get('/professeurs', async (req, res) => {
 
     const etuId = etudiant.id;
 
-    const profs = await getAll(
-      `
+    const profs = await getAll(`
       SELECT
         p.id AS prof_id,
         u.nom, u.prenom,
@@ -36,29 +33,23 @@ router.get('/professeurs', async (req, res) => {
       JOIN users u ON p.user_id = u.id
       LEFT JOIN enrollments e
         ON e.professeur_id = p.id
-        AND e.etudiant_id = ?
+        AND e.etudiant_id = $1
         AND e.semestre = 'S2'
         AND e.annee_academique = '2025-2026'
       WHERE u.actif = 1
       ORDER BY u.nom, u.prenom
-    `,
-      [etuId]
-    );
+    `, [etuId]);
 
-    const hash = crypto
-      .createHash('sha256')
+    const hash = crypto.createHash('sha256')
       .update(String(etuId) + HASH_SALT)
       .digest('hex');
 
     for (const p of profs) {
-      const eval_ = await getOne(
-        `
+      const eval_ = await getOne(`
         SELECT id FROM evaluations
-        WHERE professeur_id = ? AND etudiant_hash = ?
+        WHERE professeur_id = $1 AND etudiant_hash = $2
         AND semestre = 'S2' AND annee_academique = '2025-2026'
-      `,
-        [p.prof_id, hash]
-      );
+      `, [p.prof_id, hash]);
       p.deja_note = eval_ ? 1 : 0;
     }
 
@@ -69,14 +60,12 @@ router.get('/professeurs', async (req, res) => {
   }
 });
 
-// POST /api/etudiant/evaluer
 router.post('/evaluer', async (req, res) => {
   try {
     const userId = req.user.userId;
 
     const etudiant = await getOne(
-      `SELECT id FROM etudiants WHERE user_id = ?`,
-      [userId]
+      `SELECT id FROM etudiants WHERE user_id = $1`, [userId]
     );
 
     if (!etudiant) {
@@ -86,41 +75,22 @@ router.post('/evaluer', async (req, res) => {
     const etuId = etudiant.id;
 
     const {
-      professeur_id,
-      semestre,
-      annee_academique,
-      note_clarte,
-      note_maitrise,
-      note_disponibilite,
-      note_supports,
-      note_ponctualite,
-      commentaire,
+      professeur_id, semestre, annee_academique,
+      note_clarte, note_maitrise, note_disponibilite,
+      note_supports, note_ponctualite, commentaire
     } = req.body;
 
-    // Validation des notes
-    const notesValides = [
-      note_clarte,
-      note_maitrise,
-      note_disponibilite,
-      note_supports,
-      note_ponctualite,
-    ];
+    const notesValides = [note_clarte, note_maitrise, note_disponibilite, note_supports, note_ponctualite];
     for (const note of notesValides) {
       if (!Number.isInteger(Number(note)) || note < 1 || note > 5) {
-        return res
-          .status(400)
-          .json({ error: 'Notes invalides (1 à 5 uniquement).' });
+        return res.status(400).json({ error: 'Notes invalides (1 à 5 uniquement).' });
       }
     }
 
-    // Validation commentaire
     if (commentaire && commentaire.length > 500) {
-      return res
-        .status(400)
-        .json({ error: 'Commentaire trop long (500 caractères max).' });
+      return res.status(400).json({ error: 'Commentaire trop long (500 caractères max).' });
     }
 
-    // Sanitisation XSS
     function sanitize(str) {
       if (!str) return str;
       return str
@@ -130,65 +100,41 @@ router.post('/evaluer', async (req, res) => {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#x27;');
     }
-
     const commentaireSanitise = commentaire ? sanitize(commentaire) : null;
 
-    const inscription = await getOne(
-      `
+    const inscription = await getOne(`
       SELECT id FROM enrollments
-      WHERE etudiant_id = ? AND professeur_id = ?
-      AND semestre = ? AND annee_academique = ?
-    `,
-      [etuId, professeur_id, semestre, annee_academique]
-    );
+      WHERE etudiant_id = $1 AND professeur_id = $2
+      AND semestre = $3 AND annee_academique = $4
+    `, [etuId, professeur_id, semestre, annee_academique]);
 
     if (!inscription) {
-      return res
-        .status(403)
-        .json({ error: 'Ce professeur ne vous enseigne pas.' });
+      return res.status(403).json({ error: 'Ce professeur ne vous enseigne pas.' });
     }
 
-    const etudiant_hash = crypto
-      .createHash('sha256')
+    const etudiant_hash = crypto.createHash('sha256')
       .update(String(etuId) + HASH_SALT)
       .digest('hex');
 
-    const existant = await getOne(
-      `
+    const existant = await getOne(`
       SELECT id FROM evaluations
-      WHERE professeur_id = ? AND etudiant_hash = ?
-      AND semestre = ? AND annee_academique = ?
-    `,
-      [professeur_id, etudiant_hash, semestre, annee_academique]
-    );
+      WHERE professeur_id = $1 AND etudiant_hash = $2
+      AND semestre = $3 AND annee_academique = $4
+    `, [professeur_id, etudiant_hash, semestre, annee_academique]);
 
     if (existant) {
-      return res
-        .status(409)
-        .json({ error: 'Vous avez déjà évalué ce professeur ce semestre.' });
+      return res.status(409).json({ error: 'Vous avez déjà évalué ce professeur ce semestre.' });
     }
 
-    await runQuery(
-      `
+    await runQuery(`
       INSERT INTO evaluations
         (professeur_id, semestre, annee_academique, etudiant_hash,
          note_clarte, note_maitrise, note_disponibilite,
          note_supports, note_ponctualite, commentaire)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-      [
-        professeur_id,
-        semestre,
-        annee_academique,
-        etudiant_hash,
-        note_clarte,
-        note_maitrise,
-        note_disponibilite,
-        note_supports,
-        note_ponctualite,
-        commentaireSanitise,
-      ]
-    );
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `, [professeur_id, semestre, annee_academique, etudiant_hash,
+        note_clarte, note_maitrise, note_disponibilite,
+        note_supports, note_ponctualite, commentaireSanitise]);
 
     res.json({ message: 'Évaluation enregistrée avec succès.' });
   } catch (err) {
