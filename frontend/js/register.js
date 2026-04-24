@@ -6,7 +6,7 @@ let anneeActuelle = '2025-2026';
 async function chargerProfs() {
   try {
     const [resP, resC] = await Promise.all([
-      fetch('https://sup-management-intelligentsia-dlw2.onrender.com'),
+      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/'),
       fetch('https://sup-management-intelligentsia-dlw2.onrender.com'),
     ]);
     const dataP = await resP.json();
