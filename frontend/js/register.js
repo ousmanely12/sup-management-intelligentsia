@@ -6,9 +6,21 @@ let anneeActuelle = '2025-2026';
 async function chargerProfs() {
   try {
     const [resP, resC] = await Promise.all([
-      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/'),
-      fetch('https://sup-management-intelligentsia-dlw2.onrender.com'),
+      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/public/professeurs'),
+      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/public/config'),
     ]);
+
+    // Vérifier que la réponse est bien du JSON
+    if (!resP.ok || !resC.ok) {
+      throw new Error("API non disponible");
+    }
+
+    const contentTypeP = resP.headers.get("content-type");
+    const contentTypeC = resC.headers.get("content-type");
+
+    if (!contentTypeP.includes("application/json") || !contentTypeC.includes("application/json")) {
+      throw new Error("Réponse non-JSON reçue");
+    }
     const dataP = await resP.json();
     const dataC = await resC.json();
 
