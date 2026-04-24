@@ -1,4 +1,4 @@
-const API = 'http://localhost:3000/api';
+const API = 'https://sup-management-intelligentsia-dlw2.onrender.com/api';
 
 // Afficher une alerte
 function showAlert(type, message) {

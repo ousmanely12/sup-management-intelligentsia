@@ -6,8 +6,8 @@ let anneeActuelle = '2025-2026';
 async function chargerProfs() {
   try {
     const [resP, resC] = await Promise.all([
-      fetch('http://localhost:3000/api/public/professeurs'),
-      fetch('http://localhost:3000/api/public/config'),
+      fetch('https://sup-management-intelligentsia-dlw2.onrender.com'),
+      fetch('https://sup-management-intelligentsia-dlw2.onrender.com'),
     ]);
     const dataP = await resP.json();
     const dataC = await resC.json();
@@ -183,7 +183,7 @@ async function soumettre() {
 
   try {
     const res = await fetch(
-      'http://localhost:3000/api/auth/register-etudiant',
+      'https://sup-management-intelligentsia-dlw2.onrender.com',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

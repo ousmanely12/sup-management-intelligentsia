@@ -11,7 +11,7 @@ if (user) {
 async function chargerDashboardProf() {
   const token = getToken();
   try {
-    const res = await fetch('http://localhost:3000/api/professeur/dashboard', {
+    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/professeur/dashboard', {
       headers: { Authorization: 'Bearer ' + token },
     });
 
