@@ -12,7 +12,7 @@ if (user) {
 }
 
 async function fetchAdmin(url, options = {}) {
-  const res = await fetch('http://localhost:3000/api/admin' + url, {
+  const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/admin' + url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ async function creerUtilisateur() {
   };
 
   try {
-    const res = await fetch('http://localhost:3000/api/auth/register', {
+    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com./api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -376,7 +376,7 @@ async function supprimerInscription(enrollmentId) {
 async function chargerStatutEval() {
   try {
     const res = await fetch(
-      'http://localhost:3000/api/public/statut-evaluations'
+      'https://sup-management-intelligentsia-dlw2.onrender.com./api/public/statut-evaluations'
     );
     const data = await res.json();
     mettreAJourStatutEval(data.ouvertes);
