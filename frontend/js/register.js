@@ -195,7 +195,7 @@ async function soumettre() {
 
   try {
     const res = await fetch(
-      'https://sup-management-intelligentsia-dlw2.onrender.com',
+      'https://sup-management-intelligentsia-dlw2.onrender.com/api/auth/register-etudiant',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
