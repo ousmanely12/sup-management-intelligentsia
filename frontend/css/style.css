@@ -899,66 +899,60 @@ tr:hover td {
 /* ── Responsive ──────────────────────────────────────── */
 /* --- CONFIGURATION MOBILE (SMI PULSE) --- */
 @media (max-width: 640px) {
-  /* 1. Navigation et Logo */
+  /* 1. Navbar : On empile les éléments pour que tout soit visible */
   .navbar {
-    padding: 0 1rem;
-    height: 60px;
-  }
-  .navbar-brand span {
-    display: none; /* Cache le texte pour laisser de la place au logo */
-  }
-
-  /* 2. Le Hero (Titre et Description) */
-  .hero-section {
-    padding: 2rem 1rem;
+    flex-direction: column; /* Crucial : empile Logo, Liens et Bouton */
+    height: auto;           /* Permet à la barre de s'agrandir verticalement */
+    padding: 1rem;
+    gap: 15px;
     text-align: center;
   }
-  .hero-tagline {
-    font-size: 1.8rem;
-    line-height: 1.2;
+
+  /* 2. Logo : On ajuste la taille */
+  .logo img {
+    height: 35px;
+  }
+  .logo span {
+    font-size: 1.2rem;
+    /* Si tu veux cacher le texte sur mobile pour gagner de la place : */
+    /* display: none; */
   }
 
-  /* 3. Correction des Boutons (Espace Étudiant) */
-  .hero-buttons {
-    display: flex;
-    flex-direction: column; /* On empile verticalement */
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    margin-top: 1.5rem;
-  }
-
-  .btn {
-    width: 85%; /* Largeur adaptée au mobile */
-    max-width: 300px; /* Évite que le bouton soit trop géant */
-    padding: 0.8rem 1.2rem;
-    justify-content: center; /* Centre le texte/icône dans le bouton */
-  }
-
-  /* 4. Affichage des Liens et Grilles (S'assure que rien n'est caché) */
-  .prof-grid, 
-  .features-grid, 
+  /* 3. Liens de navigation : Ils s'affichent clairement */
   .nav-links {
-    grid-template-columns: 1fr !important; /* Force une seule colonne */
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Garde-les sur une ligne ou passe en column si besoin */
+    flex-wrap: wrap;     /* Permet de passer à la ligne si trop de liens */
+    justify-content: center;
+    gap: 15px;
     width: 100%;
-    gap: 1rem;
   }
 
-  /* 5. Ajustement des statistiques */
-  .stats-grid {
-    grid-template-columns: 1fr 1fr; /* Garde 2 colonnes pour les petits chiffres */
-    gap: 0.5rem;
+  .nav-links a {
+    font-size: 14px;
+    color: white; /* Assure-toi qu'ils soient visibles sur le fond sombre */
   }
 
-  .dashboard {
-    margin: 1rem auto;
-    padding: 0 0.5rem;
+  /* 4. Bouton Espace Étudiant */
+  .btn-connexion {
+    width: 80%;
+    max-width: 250px;
+    padding: 10px;
+    margin: 0 auto; /* Centre le bouton */
+    text-align: center;
   }
 
-  .bar-label {
-    width: 100px;
-    font-size: 11px;
+  /* 5. Le texte Hero (Titre principal) */
+  h1, .hero-tagline {
+    font-size: 1.8rem !important; 
+    line-height: 1.2;
+    padding: 0 10px;
+  }
+
+  /* 6. Grilles de contenu (Professeurs, Features) */
+  .prof-grid, 
+  .features-grid {
+    grid-template-columns: 1fr !important; 
+    gap: 1.5rem;
   }
 }
