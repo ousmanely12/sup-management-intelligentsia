@@ -136,241 +136,311 @@ body {
   border-color: var(--orange);
 }
 
-/* ── Page Login ─────────────────────────────────────── */
+/* --- CONFIGURATION UNIQUE SMI PULSE (LOGIN & REGISTER) --- */
+
+:root {
+  --bleu-smi: #0047FF;
+  --orange-smi: #FF6B00;
+  --noir-fond: #0A0A0C;
+  --gris-text: #94A3B8;
+  --gris-border: rgba(255, 255, 255, 0.08);
+  --radius-xl: 32px;
+  --radius-sm: 14px;
+}
+
+/* Structure principale */
 .login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bleu-deep);
-  padding: 1rem;
+  background-color: var(--noir-fond) !important; 
+  padding: 1.5rem;
   position: relative;
   overflow: hidden;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
+/* Effets visuels arrière-plan */
 .login-page::before {
   content: '';
   position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(59, 130, 246, 0.2) 0%,
-    transparent 70%
-  );
-  top: -200px;
-  right: -200px;
-  border-radius: 50%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0, 71, 255, 0.1) 0%, transparent 70%);
+  top: -150px; right: -150px;
 }
 
 .login-page::after {
   content: '';
   position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(
-    circle,
-    rgba(240, 90, 40, 0.15) 0%,
-    transparent 70%
-  );
-  bottom: -100px;
-  left: -100px;
-  border-radius: 50%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.07) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
 }
 
-.login-card {
-  background: white;
+/* Carte Login */
+.login-page .login-card {
+  background: rgba(255, 255, 255, 0.03) !important; 
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--gris-border) !important;
   border-radius: var(--radius-xl);
   padding: 3rem 2.5rem;
   width: 100%;
-  max-width: 440px;
-  box-shadow: var(--shadow-lg);
+  max-width: 420px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 1;
-  animation: slideUp 0.5s ease;
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+/* Titres et Textes */
+.login-page .login-header h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #FFFFFF !important;
+  margin-top: 10px;
 }
 
-.login-logo {
-  width: 72px;
-  height: 72px;
-  background: linear-gradient(135deg, var(--bleu-dark), var(--bleu-mid));
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.2rem;
-  font-family: 'Outfit', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: white;
-  line-height: 1.3;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(26, 86, 219, 0.35);
+.login-page .login-header p {
+  font-size: 0.9rem;
+  color: var(--gris-text) !important;
 }
 
-.login-header h1 {
-  font-family: 'Outfit', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--bleu-deep);
-  margin-bottom: 6px;
-  line-height: 1.3;
-}
+/* --- FORMULAIRES (ISOLÉS) --- */
 
-.login-header p {
-  font-size: 14px;
-  color: var(--gris-text);
-}
-
-.login-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.login-page .form-group {
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
-.login-divider::before,
-.login-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--gris-border);
+.login-page .form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-bottom: 8px;
 }
 
-.login-divider span {
-  font-size: 12px;
-  color: var(--gris-text);
-  white-space: nowrap;
+.login-page .form-group input,
+.login-page .form-group select,
+.login-page .form-group textarea {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(255, 255, 255, 0.05) !important; 
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: var(--radius-sm);
+  color: #FFFFFF !important;
+}
+
+/* Flèche personnalisée pour select */
+.login-page .form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='C19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 15px;
+}
+
+/* --- BOUTON (ISOLÉ) --- */
+
+.login-page .btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--orange-smi) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 25px rgba(255, 107, 0, 0.25) !important;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.login-page .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(255, 107, 0, 0.4) !important;
+  filter: brightness(1.1);
+}
+
+/* --- ALERTES (ISOLÉES) --- */
+
+.login-page .alert {
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none; 
+  text-align: center;
+}
+
+.login-page .alert-error {
+  background: rgba(255, 70, 70, 0.1) !important;
+  color: #ff8080 !important;
+  border: 1px solid rgba(255, 70, 70, 0.2) !important;
+}
+
+.login-page .alert-success {
+  background: rgba(40, 200, 100, 0.1) !important;
+  color: #70ff90 !important;
+  border: 1px solid rgba(40, 200, 100, 0.2) !important;
 }
 
 /* ── Formulaires ─────────────────────────────────────── */
+/* ── FORMULAIRES SMI PULSE (MODERNE) ─────────────────── */
+
 .form-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .form-group label {
   display: block;
-  font-size: 13px;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 7px;
-  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  margin-left: 4px;
+  letter-spacing: 0.3px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid var(--gris-border);
+  padding: 13px 16px;
+  /* Fond sombre translucide */
+  background: rgba(255, 255, 255, 0.05); 
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.95rem;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  transition: all 0.2s;
-  background: var(--gris-light);
-  color: #1e293b;
+  color: #FFFFFF;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Style spécifique pour les listes déroulantes (Select) */
+.form-group select {
+  cursor: pointer;
+  appearance: none; /* Nettoie le style par défaut */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='C19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 15px;
+}
+
+.form-group select option {
+  background-color: #1A1A1D; /* Fond des options */
+  color: white;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--bleu);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.12);
+  border-color: var(--bleu-smi);
+  background: rgba(0, 71, 255, 0.08);
+  box-shadow: 0 0 0 4px rgba(0, 71, 255, 0.15);
 }
 
-/* ── Boutons ─────────────────────────────────────────── */
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── BOUTONS (DESIGN ÉLÉGANT) ───────────────────────── */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 10px;
+  padding: 14px 24px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
   border: none;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-decoration: none;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  letter-spacing: 0.2px;
 }
 
+/* Bouton Principal (Orange SMI) */
 .btn-primary {
-  background: linear-gradient(135deg, var(--bleu), var(--bleu-mid));
+  background: var(--orange-smi);
   color: white;
   width: 100%;
-  padding: 13px;
-  font-size: 15px;
-  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+  box-shadow: 0 10px 20px rgba(255, 107, 0, 0.2);
 }
+
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--bleu-dark), var(--bleu));
-  box-shadow: 0 6px 16px rgba(26, 86, 219, 0.4);
-  transform: translateY(-1px);
-}
-.btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255, 107, 0, 0.35);
+  filter: brightness(1.1);
 }
 
-.btn-orange {
-  background: linear-gradient(135deg, var(--orange), var(--orange-mid));
-  color: white;
-  box-shadow: 0 4px 12px rgba(240, 90, 40, 0.3);
-}
-.btn-orange:hover {
-  box-shadow: 0 6px 16px rgba(240, 90, 40, 0.4);
-  transform: translateY(-1px);
-}
-
+/* Bouton Secondaire / Retour (Style Outline) */
 .btn-outline {
-  background: transparent;
-  color: var(--bleu);
-  border: 1.5px solid var(--bleu);
-}
-.btn-outline:hover {
-  background: var(--bleu-light);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ── Alertes ─────────────────────────────────────────── */
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+/* ── ALERTES ÉPURÉES ───────────────────────────────── */
+
 .alert {
-  padding: 11px 14px;
+  padding: 14px 18px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: 500;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   display: none;
+  border: 1px solid transparent;
+  animation: slideIn 0.3s ease;
 }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .alert.show {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
 .alert-error {
-  background: #fef2f2;
-  color: var(--rouge);
-  border-left: 3px solid var(--rouge);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
+
 .alert-success {
-  background: #f0fdf4;
-  color: var(--vert);
-  border-left: 3px solid var(--vert);
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Style spécial pour le compteur de profs sélectionnés */
+#count-selectionnes {
+  color: var(--orange-smi);
+  font-weight: 800;
 }
 
 /* ── Dashboard layout ────────────────────────────────── */
@@ -921,4 +991,132 @@ tr:hover td {
     width: 120px;
     font-size: 12px;
   }
+}
+ /* --- RÉPARATION DES BOUTONS DU TABLEAU ADMIN --- */
+
+/* On cible spécifiquement les boutons dans les cellules du tableau (td) */
+table td .btn, 
+table td button,
+.action-buttons .btn {
+    color: #1e293b !important; /* Force le texte en gris très foncé/noir */
+    background-color: #f1f5f9 !important; /* Force un fond gris clair pour les voir */
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Style spécifique pour le bouton Modifier (souvent bleu ou vert en admin) */
+table td .btn-edit, 
+table td .btn-warning {
+    background-color: #dbeafe !important; /* Bleu clair */
+    color: #1e40af !important; /* Bleu foncé */
+    border-color: #bfdbfe !important;
+}
+
+/* Style spécifique pour le bouton Supprimer (souvent rouge) */
+table td .btn-delete, 
+table td .btn-danger {
+    background-color: #fee2e2 !important; /* Rouge clair */
+    color: #991b1b !important; /* Rouge foncé */
+    border-color: #fecaca !important;
+}
+
+/* On s'assure que le bouton "+ Ajouter" en haut à droite reste lisible aussi */
+.header-actions .btn, 
+.gestion-header .btn {
+    color: #1e293b !important;
+}
+
+/* --- CORRECTIF VISIBILITÉ DASHBOARD ADMIN --- */
+
+/* On force le texte des labels et des titres du dashboard en sombre */
+.dashboard label, 
+.dashboard .form-group label,
+.section-card h2,
+.dashboard-title {
+    color: #1e293b !important; /* Gris très foncé presque noir */
+}
+
+/* On s'assure que les selects et inputs du dashboard sont lisibles */
+.dashboard select, 
+.dashboard input:not([type="checkbox"]) {
+    color: #334155 !important; /* Texte sombre pour les champs */
+    background-color: #ffffff !important; /* Fond blanc pour les champs */
+    border: 1px solid #cbd5e1 !important; /* Bordure grise claire */
+}
+
+/* Correction spécifique pour les options des listes déroulantes */
+.dashboard select option {
+    background-color: #ffffff !important;
+    color: #334155 !important;
+}
+
+/* On remet le message d'inscription en sombre */
+#enroll-msg {
+    color: #64748b !important;
+}
+
+/* On s'assure que le fond de la section card reste blanc/clair */
+.section-card {
+    background: #ffffff !important;
+    color: #1e293b !important;
+}
+/* --- CORRECTIF VISIBILITÉ DES MODAUX (AJOUT/MODIF USER) --- */
+
+/* On force les labels et titres dans les modaux en sombre */
+.modal label,
+.modal h3,
+.modal-header h3 {
+    color: #1e293b !important; /* Gris foncé */
+    opacity: 1 !important;
+    display: block !important;
+}
+
+/* On force les champs de saisie des modaux en mode "clair" */
+.modal input, 
+.modal select, 
+.modal textarea {
+    color: #334155 !important; /* Texte sombre */
+    background-color: #ffffff !important; /* Fond blanc */
+    border: 1px solid #cbd5e1 !important; /* Bordure visible */
+}
+
+/* Pour les placeholders (le texte d'exemple dans les cases) */
+.modal input::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* On s'assure que le fond de la modal elle-même est bien blanc */
+.modal {
+    background-color: #ffffff !important;
+}
+
+/* On remet les boutons "Annuler" en gris pour qu'ils soient visibles */
+.btn-outline {
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    background: #ffffff !important;
+} 
+/* --- TOUCHE FINALE POUR UN DASHBOARD PRO --- */
+
+.modal-body .form-group label {
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  color: #0f172a !important; /* Un noir bleuté très pro */
+}
+
+.modal-body input:focus, 
+.modal-body select:focus {
+  border-color: #0047FF !important; /* Ton bleu SMI au focus */
+  box-shadow: 0 0 0 3px rgba(0, 71, 255, 0.1) !important;
+  outline: none !important;
+}
+
+/* On s'assure que le bouton "Modifier" du mot de passe est bien orange */
+#modal-password .btn-primary {
+  background: #FF6B00 !important;
+  color: white !important;
 }

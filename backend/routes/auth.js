@@ -37,13 +37,12 @@ router.post('/login', async (req, res) => {
 
     if (user.role === 'etudiant') {
       const etudiant = await getOne(
-        `SELECT id, numero_etudiant, filiere, niveau FROM etudiants WHERE user_id = $1`,
+        `SELECT id, filiere, niveau FROM etudiants WHERE user_id = $1`,
         [user.id]
       );
       if (etudiant) {
         profileId = etudiant.id;
         profileInfo = {
-          numero_etudiant: etudiant.numero_etudiant,
           filiere: etudiant.filiere,
           niveau: etudiant.niveau
         };
@@ -96,7 +95,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { nom, prenom, email, password, role, matiere, departement, numero_etudiant, filiere, niveau } = req.body;
+    const { nom, prenom, email, password, role, matiere, departement, filiere, niveau } = req.body;
 
     if (!nom || !prenom || !email || !password || !role) {
       return res.status(400).json({ error: 'Champs obligatoires manquants.' });
@@ -136,12 +135,12 @@ router.post('/register', async (req, res) => {
         [userId, matiere, departement || null]
       );
     } else if (role === 'etudiant') {
-      if (!numero_etudiant || !filiere || !niveau) {
-        return res.status(400).json({ error: 'Numéro étudiant, filière et niveau obligatoires.' });
+      if ( !filiere || !niveau) {
+        return res.status(400).json({ error: 'filière et niveau obligatoires.' });
       }
       await runQuery(
-        `INSERT INTO etudiants (user_id, numero_etudiant, filiere, niveau) VALUES ($1, $2, $3, $4)`,
-        [userId, numero_etudiant, filiere, niveau]
+        `INSERT INTO etudiants (user_id,filiere, niveau) VALUES ($1, $2, $3, $4)`,
+        [userId,  filiere, niveau]
       );
     }
 
@@ -157,7 +156,7 @@ router.post('/register-etudiant', async (req, res) => {
   try {
     const {
       nom, prenom, email, password,
-      numero_etudiant, filiere, niveau,
+      filiere, niveau,
       professeurs, semestre, annee_academique,
       code_inscription
     } = req.body;
@@ -179,7 +178,7 @@ router.post('/register-etudiant', async (req, res) => {
       return res.status(403).json({ error: "Ce code a atteint sa limite d'utilisation." });
     }
 
-    if (!nom || !prenom || !email || !password || !numero_etudiant || !filiere || !niveau) {
+    if (!nom || !prenom || !email || !password || !filiere || !niveau) {
       return res.status(400).json({ error: 'Tous les champs sont obligatoires.' });
     }
 
@@ -196,11 +195,6 @@ router.post('/register-etudiant', async (req, res) => {
       return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
     }
 
-    const existingNum = await getOne(`SELECT id FROM etudiants WHERE numero_etudiant = $1`, [numero_etudiant]);
-    if (existingNum) {
-      return res.status(409).json({ error: 'Ce numéro étudiant est déjà utilisé.' });
-    }
-
     const password_hash = await bcrypt.hash(password, 12);
 
     const userResult = await runQuery(
@@ -211,10 +205,13 @@ router.post('/register-etudiant', async (req, res) => {
 
     const userId = userResult.lastID;
 
+    // Génération automatique du numéro étudiant
+    const numero_etudiant = 'ETU-' + Date.now();
+
     const etuResult = await runQuery(
-      `INSERT INTO etudiants (user_id, numero_etudiant, filiere, niveau)
+      `INSERT INTO etudiants (user_id, filiere, niveau, numero_etudiant)
        VALUES ($1, $2, $3, $4) RETURNING id`,
-      [userId, numero_etudiant, filiere, niveau]
+      [userId, filiere, niveau, numero_etudiant]
     );
 
     const etuId = etuResult.lastID;
@@ -239,6 +236,7 @@ router.post('/register-etudiant', async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 });
+
 
 router.put('/change-password', require('../middleware/auth').verifyToken, async (req, res) => {
   try {
