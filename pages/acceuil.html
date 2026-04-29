@@ -9,346 +9,321 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <style>
     :root {
-  --bleu-smi: #0047FF;
-  --orange-smi: #FF6B00;
-  --noir-fond: #0A0A0C;
-  --gris-texte: #94A3B8;
-  --blanc: #FFFFFF;
-  --glass: rgba(255, 255, 255, 0.02);
-}
+      --bleu-smi: #0047FF;
+      --orange-smi: #FF6B00;
+      --noir-fond: #0A0A0C;
+      --gris-texte: #94A3B8;
+      --blanc: #FFFFFF;
+      --glass: rgba(255, 255, 255, 0.02);
+    }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  outline: none;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: var(--noir-fond);
-  color: var(--blanc);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--noir-fond);
+      color: var(--blanc);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-.bg-gradient {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: radial-gradient(circle at 10% 10%, rgba(0, 71, 255, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 90% 90%, rgba(255, 107, 0, 0.08) 0%, transparent 40%);
-  z-index: -1;
-}
+    .bg-gradient {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 10% 10%, rgba(0, 71, 255, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 90%, rgba(255, 107, 0, 0.08) 0%, transparent 40%);
+      z-index: -1;
+    }
 
-/* --- Navigation --- */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 5%;
-  position: absolute;
-  width: 100%;
-  z-index: 100;
-}
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 5%;
+      position: relative;
+      width: 100%;
+      z-index: 100;
+    }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: -0.5px;
-}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
 
-.logo img {
-  height: 40px;
-  border-radius: 8px;
-}
+    .logo img {
+      height: 40px;
+      border-radius: 8px;
+    }
 
-.burger-menu {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  z-index: 1000;
-}
+    .burger-menu {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      padding: 10px;
+    }
 
-.burger-menu span {
-  width: 25px;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
-  transition: all 0.3s;
-}
+    .burger-menu span {
+      width: 30px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
 
-.nav-links {
-  display: flex;
-  gap: 3rem;
-}
+    .burger-menu.active span:nth-child(1) {
+      transform: rotate(45deg) translate(9px, 9px);
+    }
 
-.nav-links a {
-  text-decoration: none;
-  color: var(--blanc);
-  font-size: 0.9rem;
-  font-weight: 500;
-  opacity: 0.7;
-  transition: 0.3s;
-}
+    .burger-menu.active span:nth-child(2) {
+      opacity: 0;
+    }
 
-.nav-links a:hover {
-  opacity: 1;
-  color: var(--orange-smi);
-}
+    .burger-menu.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(9px, -9px);
+    }
 
-.btn-connexion {
-  padding: 0.8rem 2rem;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--glass);
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  backdrop-filter: blur(10px);
-  transition: 0.3s;
-}
+    .nav-links {
+      display: flex;
+      gap: 3rem;
+    }
 
-.btn-connexion:hover {
-  background: var(--blanc);
-  color: var(--noir-fond);
-}
+    .nav-links a {
+      text-decoration: none;
+      color: var(--blanc);
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.7;
+      transition: 0.3s;
+    }
 
-/* --- Hero --- */
-.hero {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 5%;
-}
+    .nav-links a:hover {
+      opacity: 1;
+      color: var(--orange-smi);
+    }
 
-.hero span.tagline {
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--orange-smi);
-  margin-bottom: 1.5rem;
-  display: block;
-}
+    .btn-connexion {
+      padding: 0.8rem 2rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--glass);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
+    }
 
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  line-height: 1.1;
-  margin-bottom: 2rem;
-  font-weight: 700;
-}
+    .btn-connexion:hover {
+      background: var(--blanc);
+      color: var(--noir-fond);
+    }
 
-.hero h1 i {
-  font-style: italic;
-  color: var(--bleu-smi);
-}
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 5%;
+    }
 
-.hero p {
-  max-width: 600px;
-  font-size: 1.1rem;
-  color: var(--gris-texte);
-  margin-bottom: 3rem;
-  font-weight: 300;
-}
+    .hero span.tagline {
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--orange-smi);
+      margin-bottom: 1.5rem;
+      display: block;
+    }
 
-.cta-group {
-  display: flex;
-  gap: 1.5rem;
-}
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 6.5rem);
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      font-weight: 700;
+    }
 
-.btn-main {
-  padding: 1.2rem 3rem;
-  background: var(--orange-smi);
-  color: white;
-  text-decoration: none;
-  border-radius: 100px;
-  font-weight: 700;
-  box-shadow: 0 20px 40px rgba(255, 107, 0, 0.2);
-  transition: 0.4s;
-}
+    .hero h1 i {
+      font-style: italic;
+      color: var(--bleu-smi);
+    }
 
-.btn-main:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px rgba(255, 107, 0, 0.4);
-}
+    .hero p {
+      max-width: 600px;
+      font-size: 1.1rem;
+      color: var(--gris-texte);
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
 
-/* --- Features --- */
-.features {
-  padding: 100px 5%;
-  max-width: 1300px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-}
+    .btn-main {
+      padding: 1.2rem 3rem;
+      background: var(--orange-smi);
+      color: white;
+      text-decoration: none;
+      border-radius: 100px;
+      font-weight: 700;
+      box-shadow: 0 20px 40px rgba(255, 107, 0, 0.2);
+      transition: 0.4s;
+      display: inline-block;
+    }
 
-.card {
-  background: var(--glass);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 3rem;
-  border-radius: 32px;
-  transition: 0.4s;
-}
+    .btn-main:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px rgba(255, 107, 0, 0.4);
+    }
 
-.card:hover {
-  border-color: var(--bleu-smi);
-  background: rgba(0, 71, 255, 0.02);
-}
+    /* Features */
+    .features {
+      padding: 100px 5%;
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
 
-.card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  font-weight: 700;
-}
+    .card {
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 3rem;
+      border-radius: 32px;
+      transition: 0.4s;
+    }
 
-.card p {
-  color: var(--gris-texte);
-  font-size: 0.95rem;
-}
+    .card:hover {
+      border-color: var(--bleu-smi);
+      background: rgba(0, 71, 255, 0.02);
+    }
 
-.card .icon {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 107, 0, 0.1);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2rem;
-  color: var(--orange-smi);
-  font-weight: 800;
-}
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
 
-/* --- Footer --- */
-footer {
-  padding: 4rem 5%;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--gris-texte);
-  font-size: 0.85rem;
-}
+    .card p {
+      color: var(--gris-texte);
+      font-size: 0.95rem;
+    }
 
-/* --- Responsive Mobile --- */
-@media (max-width: 968px) {
-  nav {
-    padding: 1.5rem 5%;
-  }
+    .card .icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 107, 0, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      color: var(--orange-smi);
+      font-weight: 800;
+    }
 
-  .burger-menu {
-    display: flex;
-  }
+    footer {
+      padding: 4rem 5%;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--gris-texte);
+      font-size: 0.85rem;
+    }
 
-  .nav-links {
-    display: none;
-    position: fixed;
-    top: 85px;
-    left: 0;
-    right: 0;
-    background: rgba(10, 10, 12, 0.98);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    flex-direction: column;
-    padding: 2rem;
-    gap: 1.5rem;
-    z-index: 999;
-  }
+    /* Mobile Responsive */
+    @media (max-width: 968px) {
+      .burger-menu {
+        display: flex !important;
+      }
 
-  .nav-links.active {
-    display: flex !important;
-  }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 90px;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 12, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        flex-direction: column;
+        padding: 2rem;
+        gap: 2rem;
+        z-index: 999;
+      }
 
-  .burger-menu.active span:nth-child(1) {
-    transform: rotate(45deg) translate(7px, 7px);
-  }
+      .nav-links.active {
+        display: flex !important;
+      }
 
-  .burger-menu.active span:nth-child(2) {
-    opacity: 0;
-  }
+      .nav-links a {
+        font-size: 1.1rem;
+        text-align: center;
+      }
 
-  .burger-menu.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-  }
+      .btn-connexion {
+        position: fixed;
+        bottom: 20px;
+        left: 5%;
+        right: 5%;
+        text-align: center;
+        z-index: 1000;
+      }
 
-  .btn-connexion {
-    display: none;
-  }
+      .features {
+        grid-template-columns: 1fr;
+      }
 
-  .features {
-    grid-template-columns: 1fr;
-  }
-
-  .hero h1 {
-    font-size: 3rem;
-  }
-
-  footer {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-</style>
+      footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <div class="bg-gradient"></div>
 
-  <nav style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; position: absolute; width: 100%; z-index: 100;">
+  <nav>
     <div class="logo">
-      <img src="../logo_SMI.png" alt="SMI Logo" style="height: 40px; border-radius: 8px;">
+      <img src="../logo_SMI.png" alt="SMI Logo">
       <span>SMI PULSE</span>
     </div>
-  
-    <div class="burger-menu" onclick="toggleMenu()" style="display: none; flex-direction: column; gap: 5px; cursor: pointer;">
-      <span style="width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
-      <span style="width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
-      <span style="width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
+
+    <div class="burger-menu" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
-  
-    <div class="nav-links" id="navMenu" style="display: flex; gap: 3rem;">
+
+    <div class="nav-links" id="navMenu">
       <a href="#vision">Notre Vision</a>
       <a href="#methode">Méthodologie</a>
       <a href="#support">Support</a>
     </div>
-  
+
     <a href="/pages/login.html" class="btn-connexion">Espace Étudiant</a>
   </nav>
-  
-  <style>
-  @media (max-width: 968px) {
-    .burger-menu { display: flex !important; }
-    .nav-links { display: none !important; }
-    .nav-links.active { 
-      display: flex !important; 
-      position: fixed !important;
-      top: 80px !important;
-      left: 0 !important;
-      right: 0 !important;
-      flex-direction: column !important;
-      background: rgba(10, 10, 12, 0.98) !important;
-      padding: 2rem !important;
-      gap: 1.5rem !important;
-    }
-    .btn-connexion { display: none !important; }
-  }
-  </style>
+
   <section class="hero">
     <span class="tagline">Plateforme d'Évaluation Officielle</span>
     <h1>L'enseignement est un <i>art</i>,<br>votre avis est la clé.</h1>
     <p>Une expérience d'évaluation fluide, totalement anonyme et sécurisée pour bâtir ensemble l'avenir de Sup Management Intelligentsia.</p>
-    
-    <div class="cta-group">
-      <a href="/pages/register.html" class="btn-main">Commencer l'évaluation</a>
-    </div>
+    <a href="/pages/register.html" class="btn-main">Commencer l'évaluation</a>
   </section>
 
   <section class="features">
@@ -370,7 +345,7 @@ footer {
   </section>
 
   <section style="text-align: center; padding: 100px 5%;">
-    <h2 style="font-family: 'Playfair Display'; font-size: 3rem; margin-bottom: 20px;">Prêt à contribuer ?</h2>
+    <h2 style="font-family: 'Playfair Display'; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 20px;">Prêt à contribuer ?</h2>
     <p style="color: var(--gris-texte); margin-bottom: 40px;">Rejoignez les centaines d'étudiants qui façonnent déjà SMI.</p>
     <a href="/pages/register.html" class="btn-main" style="background: var(--bleu-smi); box-shadow: 0 20px 40px rgba(0, 71, 255, 0.2);">S'inscrire gratuitement</a>
   </section>
@@ -383,7 +358,6 @@ footer {
     </div>
   </footer>
 
-
   <script>
     function toggleMenu() {
       const menu = document.getElementById('navMenu');
@@ -391,8 +365,7 @@ footer {
       menu.classList.toggle('active');
       burger.classList.toggle('active');
     }
-  
-    // Fermer le menu quand on clique sur un lien
+
     document.querySelectorAll('.nav-links a').forEach(link => {
       link.addEventListener('click', () => {
         document.getElementById('navMenu').classList.remove('active');
