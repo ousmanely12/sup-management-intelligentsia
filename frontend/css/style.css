@@ -898,21 +898,22 @@ tr:hover td {
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 640px) {
+  /* --- Tes réglages actuels conservés --- */
   .navbar {
     padding: 0 1rem;
   }
   .navbar-brand span {
-    display: none;
+    display: none; /* Cache le texte du logo sur petit mobile */
   }
   .dashboard {
     margin: 1rem auto;
     padding: 0 1rem;
   }
   .prof-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Les profs s'empilent */
   }
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Les stats restent sur 2 colonnes */
   }
   .login-card {
     padding: 2rem 1.5rem;
@@ -920,5 +921,28 @@ tr:hover td {
   .bar-label {
     width: 120px;
     font-size: 12px;
+  }
+
+  /* --- AJOUTS pour corriger les boutons et les liens manquants --- */
+  .hero-buttons {
+    display: flex;
+    flex-direction: column; /* Empile les boutons */
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .btn {
+    width: 90%; /* Le bouton prend presque toute la largeur */
+    max-width: 300px; /* Mais il ne devient pas géant */
+    text-align: center;
+  }
+
+  /* Pour s'assurer que TOUS les liens du menu ou des grilles sont visibles */
+  .features-grid, .nav-links {
+    grid-template-columns: 1fr; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 }
