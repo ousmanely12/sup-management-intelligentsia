@@ -206,7 +206,7 @@ async function creerUtilisateur() {
   };
 
   try {
-    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com./api/auth/register', {
+    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

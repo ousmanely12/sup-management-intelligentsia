@@ -43,7 +43,6 @@ function passerEtape2() {
   const prenom = document.getElementById('reg-prenom').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
-  const numero = document.getElementById('reg-numero').value.trim();
   const filiere = document.getElementById('reg-filiere').value;
   const niveau = document.getElementById('reg-niveau').value;
 
@@ -52,7 +51,6 @@ function passerEtape2() {
     !prenom ||
     !email ||
     !password ||
-    !numero ||
     !filiere ||
     !niveau
   ) {
@@ -181,7 +179,6 @@ async function soumettre() {
     prenom: document.getElementById('reg-prenom').value.trim(),
     email: document.getElementById('reg-email').value.trim(),
     password: document.getElementById('reg-password').value,
-    numero_etudiant: document.getElementById('reg-numero').value.trim(),
     filiere: document.getElementById('reg-filiere').value,
     niveau: document.getElementById('reg-niveau').value,
     professeurs: Array.from(profsSelectionnes),
