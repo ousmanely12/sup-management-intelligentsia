@@ -895,70 +895,167 @@ tr:hover td {
     transform: scale(0.85);
   }
 }
-
-/* ── Responsive ──────────────────────────────────────── */
-/* --- CONFIGURATION MOBILE (SMI PULSE) --- */
-@media (max-width: 640px) {
-  /* 1. Navigation et Logo */
-  .navbar {
-    padding: 0 1rem;
-    height: 60px;
-  }
-  .navbar-brand span {
-    display: none; /* Cache le texte pour laisser de la place au logo */
+/* ── Responsive Mobile ──────────────────────────────────────── */
+@media (max-width: 968px) {
+  /* Navigation */
+  nav {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
   }
 
-  /* 2. Le Hero (Titre et Description) */
-  .hero-section {
-    padding: 2rem 1rem;
-    text-align: center;
-  }
-  .hero-tagline {
-    font-size: 1.8rem;
-    line-height: 1.2;
-  }
-
-  /* 3. Correction des Boutons (Espace Étudiant) */
-  .hero-buttons {
-    display: flex;
-    flex-direction: column; /* On empile verticalement */
-    align-items: center;
-    gap: 1rem;
+  .logo-nav {
     width: 100%;
-    margin-top: 1.5rem;
+    justify-content: center;
   }
 
-  .btn {
-    width: 85%; /* Largeur adaptée au mobile */
-    max-width: 300px; /* Évite que le bouton soit trop géant */
-    padding: 0.8rem 1.2rem;
-    justify-content: center; /* Centre le texte/icône dans le bouton */
+  .logo-nav img {
+    width: 40px;
+    height: 40px;
   }
 
-  /* 4. Affichage des Liens et Grilles (S'assure que rien n'est caché) */
-  .prof-grid, 
-  .features-grid, 
+  .logo-nav h1 {
+    font-size: 1.5rem;
+  }
+
   .nav-links {
-    grid-template-columns: 1fr !important; /* Force une seule colonne */
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     width: 100%;
     gap: 1rem;
+    text-align: center;
   }
 
-  /* 5. Ajustement des statistiques */
+  .nav-links a {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+
+  .btn-nav {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  /* Hero */
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.5rem;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .badge {
+    margin: 0 auto 2rem;
+  }
+
+  h1 {
+    font-size: 3rem !important;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .cta-buttons {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .btn-cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hero Visual */
+  .hero-visual {
+    max-width: 100%;
+  }
+
+  .visual-card {
+    padding: 2rem 1.5rem;
+  }
+
   .stats-grid {
-    grid-template-columns: 1fr 1fr; /* Garde 2 colonnes pour les petits chiffres */
-    gap: 0.5rem;
+    grid-template-columns: 1fr;
   }
 
-  .dashboard {
-    margin: 1rem auto;
-    padding: 0 0.5rem;
+  .stat-value {
+    font-size: 2rem;
   }
 
-  .bar-label {
-    width: 100px;
-    font-size: 11px;
+  /* Features */
+  .features {
+    padding: 5rem 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 2.5rem;
+  }
+
+  .section-header p {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    padding: 2rem 1.5rem;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding: 0 1.5rem;
+    margin-bottom: 5rem;
+  }
+
+  .cta-box {
+    padding: 3rem 2rem;
+  }
+
+  .cta-box h2 {
+    font-size: 2rem;
+  }
+
+  .cta-box p {
+    font-size: 1rem;
+  }
+
+  /* Orbes animées - on réduit leur taille sur mobile */
+  .orb-1 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .orb-2 {
+    width: 350px;
+    height: 350px;
+  }
+
+  .orb-3 {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2.5rem !important;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+  }
+
+  .cta-box h2 {
+    font-size: 1.8rem;
+  }
+
+  .visual-header h3 {
+    font-size: 1.1rem;
   }
 }
