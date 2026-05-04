@@ -8,75 +8,79 @@
   </head>
   <body class="login-body">
     <div class="login-page">
-      <div class="login-card">
-        <div class="login-header">
-          <div class="login-header">
-            <img
-              src="../logo_SMI.png"
-              alt="SMI Logo"
-              style="
-                height: 80px;
-                width: auto;
-                margin-bottom: 1.2rem;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-              "
-            />
-            <h1>Sup Management Intelligentsia</h1>
-            <p>Connectez-vous à votre espace</p>
-          </div>
+      <div class="auth-bg-layer" aria-hidden="true">
+        <div class="auth-mesh"></div>
+        <div class="auth-noise"></div>
+        <div class="auth-orb auth-orb--1"></div>
+        <div class="auth-orb auth-orb--2"></div>
+        <div class="auth-orb auth-orb--3"></div>
+      </div>
 
-          <div
-            style="
-              text-align: center;
-              margin-top: 1.2rem;
-              font-size: 13px;
-              color: var(--gris-text);
-            "
-          >
-            Pas encore de compte ?
-            <a
-              href="/pages/register.html"
-              style="
-                color: var(--bleu);
-                font-weight: 600;
-                text-decoration: none;
-              "
-            >
-              S'inscrire
-            </a>
+      <div class="auth-wrap">
+        <aside class="auth-side">
+          <p class="auth-side-kicker">SMI PULSE</p>
+          <h2 class="auth-side-title">
+            Votre avis compte pour façonner l’excellence pédagogique.
+          </h2>
+          <p class="auth-side-text">
+            Accédez à votre espace étudiant sécurisé pour évaluer vos cours en
+            toute confidentialité.
+          </p>
+          <ul class="auth-side-list">
+            <li>Évaluations 100 % anonymes</li>
+            <li>Données protégées et chiffrées</li>
+            <li>Interface simple et rapide</li>
+          </ul>
+        </aside>
+
+        <div class="auth-panel">
+          <p class="auth-mobile-tag">Sup Management Intelligentsia</p>
+          <div class="login-card">
+            <header class="login-header">
+              <img
+                class="auth-logo"
+                src="../logo_SMI.png"
+                alt="Logo SMI"
+              />
+              <h1>Connexion</h1>
+              <p>Entrez vos identifiants pour accéder à votre espace</p>
+            </header>
+
+            <div class="alert alert-error" id="alert-error"></div>
+            <div class="alert alert-success" id="alert-success"></div>
+
+            <form id="login-form">
+              <div class="form-group form-group--tight">
+                <label for="email">Adresse email</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="vous@exemple.com"
+                  required
+                  autocomplete="email"
+                />
+              </div>
+              <div class="form-group form-group--tight">
+                <label for="password">Mot de passe</label>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="••••••••"
+                  required
+                  autocomplete="current-password"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-login">
+                Se connecter
+              </button>
+            </form>
+
+            <p class="auth-subtle">
+              Pas encore de compte ?
+              <a class="auth-link" href="register.html">Créer un compte étudiant</a>
+            </p>
           </div>
         </div>
-
-        <div class="alert alert-error" id="alert-error"></div>
-        <div class="alert alert-success" id="alert-success"></div>
-
-        <form id="login-form">
-          <div class="form-group">
-            <label for="email">Adresse email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="votre@email.com"
-              required
-              autocomplete="email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="password">Mot de passe</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="••••••••"
-              required
-              autocomplete="current-password"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary" id="btn-login">
-            Se connecter
-          </button>
-        </form>
       </div>
     </div>
 

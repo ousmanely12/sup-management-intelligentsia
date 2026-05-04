@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 async function initDatabase() {
@@ -37,7 +37,9 @@ async function initDatabase() {
         user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         numero_etudiant TEXT UNIQUE NOT NULL,
         filiere TEXT NOT NULL,
-        niveau TEXT NOT NULL
+        niveau TEXT NOT NULL,
+        semestre TEXT DEFAULT 'S1',
+        annee_academique TEXT DEFAULT '2024-2025'
       )
     `);
 
@@ -59,11 +61,12 @@ async function initDatabase() {
         semestre TEXT NOT NULL,
         annee_academique TEXT NOT NULL,
         etudiant_hash TEXT NOT NULL,
-        note_clarte INTEGER NOT NULL CHECK(note_clarte BETWEEN 1 AND 5),
-        note_maitrise INTEGER NOT NULL CHECK(note_maitrise BETWEEN 1 AND 5),
-        note_disponibilite INTEGER NOT NULL CHECK(note_disponibilite BETWEEN 1 AND 5),
-        note_supports INTEGER NOT NULL CHECK(note_supports BETWEEN 1 AND 5),
-        note_ponctualite INTEGER NOT NULL CHECK(note_ponctualite BETWEEN 1 AND 5),
+        note_clarte INTEGER CHECK (note_clarte BETWEEN 1 AND 5),
+        note_maitrise INTEGER CHECK (note_maitrise BETWEEN 1 AND 5),
+        note_disponibilite INTEGER CHECK (note_disponibilite BETWEEN 1 AND 5),
+        note_supports INTEGER CHECK (note_supports BETWEEN 1 AND 5),
+        note_ponctualite INTEGER CHECK (note_ponctualite BETWEEN 1 AND 5),
+        note_engagement INTEGER CHECK (note_engagement BETWEEN 1 AND 5),
         commentaire TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(professeur_id, etudiant_hash, semestre, annee_academique)
@@ -111,4 +114,5 @@ async function getAll(sql, params = []) {
   const result = await pool.query(convertedSql, params);
   return result.rows;
 }
+
 module.exports = { initDatabase, runQuery, getOne, getAll };

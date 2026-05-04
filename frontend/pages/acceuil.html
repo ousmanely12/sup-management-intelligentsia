@@ -21,7 +21,6 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      outline: none;
     }
 
     body {
@@ -32,7 +31,6 @@
       overflow-x: hidden;
     }
 
-    /* --- Background Sophistiqué --- */
     .bg-gradient {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -41,13 +39,13 @@
       z-index: -1;
     }
 
-    /* --- Navigation Élégante --- */
+    /* Navigation */
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 2rem 5%;
-      position: absolute;
+      position: relative;
       width: 100%;
       z-index: 100;
     }
@@ -58,12 +56,41 @@
       gap: 12px;
       font-weight: 800;
       font-size: 1.2rem;
-      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: inherit;
     }
 
     .logo img {
       height: 40px;
       border-radius: 8px;
+    }
+
+    .burger-menu {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .burger-menu span {
+      width: 30px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    .burger-menu.active span:nth-child(1) {
+      transform: rotate(45deg) translate(9px, 9px);
+    }
+
+    .burger-menu.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .burger-menu.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(9px, -9px);
     }
 
     .nav-links {
@@ -102,9 +129,9 @@
       color: var(--noir-fond);
     }
 
-    /* --- Hero Section --- */
+    /* Hero */
     .hero {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -125,7 +152,7 @@
 
     .hero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-size: clamp(2.5rem, 8vw, 6.5rem);
       line-height: 1.1;
       margin-bottom: 2rem;
       font-weight: 700;
@@ -144,11 +171,6 @@
       font-weight: 300;
     }
 
-    .cta-group {
-      display: flex;
-      gap: 1.5rem;
-    }
-
     .btn-main {
       padding: 1.2rem 3rem;
       background: var(--orange-smi);
@@ -158,6 +180,7 @@
       font-weight: 700;
       box-shadow: 0 20px 40px rgba(255, 107, 0, 0.2);
       transition: 0.4s;
+      display: inline-block;
     }
 
     .btn-main:hover {
@@ -165,7 +188,7 @@
       box-shadow: 0 25px 50px rgba(255, 107, 0, 0.4);
     }
 
-    /* --- Feature Grid (Bento Style Épuré) --- */
+    /* Features */
     .features {
       padding: 100px 5%;
       max-width: 1300px;
@@ -212,7 +235,6 @@
       font-weight: 800;
     }
 
-    /* --- Footer --- */
     footer {
       padding: 4rem 5%;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -223,11 +245,54 @@
       font-size: 0.85rem;
     }
 
-    /* --- Responsive --- */
-    @media (max-width: 900px) {
-      .nav-links { display: none; }
-      .features { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 3.5rem; }
+    /* Mobile Responsive */
+    @media (max-width: 968px) {
+      .burger-menu {
+        display: flex !important;
+      }
+
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 90px;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 12, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        flex-direction: column;
+        padding: 2rem;
+        gap: 2rem;
+        z-index: 999;
+      }
+
+      .nav-links.active {
+        display: flex !important;
+      }
+
+      .nav-links a {
+        font-size: 1.1rem;
+        text-align: center;
+      }
+
+      .btn-connexion {
+        position: fixed;
+        bottom: 20px;
+        left: 5%;
+        right: 5%;
+        text-align: center;
+        z-index: 1000;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -235,16 +300,24 @@
 
   <div class="bg-gradient"></div>
 
-  <nav class="navbar">
-    <div class="logo">
+  <nav>
+    <a href="acceuil.html" class="logo">
       <img src="../logo_SMI.png" alt="SMI Logo">
       <span>SMI PULSE</span>
+    </a>
+
+    <div class="burger-menu" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
-    <div class="nav-links">
+
+    <div class="nav-links" id="navMenu">
       <a href="vision.html">Notre Vision</a>
       <a href="methode.html">Méthodologie</a>
       <a href="support.html">Support</a>
     </div>
+
     <a href="/pages/login.html" class="btn-connexion">Espace Étudiant</a>
   </nav>
 
@@ -252,10 +325,7 @@
     <span class="tagline">Plateforme d'Évaluation Officielle</span>
     <h1>L'enseignement est un <i>art</i>,<br>votre avis est la clé.</h1>
     <p>Une expérience d'évaluation fluide, totalement anonyme et sécurisée pour bâtir ensemble l'avenir de Sup Management Intelligentsia.</p>
-    
-    <div class="cta-group">
-      <a href="/pages/register.html" class="btn-main">Commencer l'évaluation</a>
-    </div>
+    <a href="/pages/register.html" class="btn-main">Commencer l'évaluation</a>
   </section>
 
   <section class="features">
@@ -277,7 +347,7 @@
   </section>
 
   <section style="text-align: center; padding: 100px 5%;">
-    <h2 style="font-family: 'Playfair Display'; font-size: 3rem; margin-bottom: 20px;">Prêt à contribuer ?</h2>
+    <h2 style="font-family: 'Playfair Display'; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 20px;">Prêt à contribuer ?</h2>
     <p style="color: var(--gris-texte); margin-bottom: 40px;">Rejoignez les centaines d'étudiants qui façonnent déjà SMI.</p>
     <a href="/pages/register.html" class="btn-main" style="background: var(--bleu-smi); box-shadow: 0 20px 40px rgba(0, 71, 255, 0.2);">S'inscrire gratuitement</a>
   </section>
@@ -289,6 +359,22 @@
       <a href="#" style="color: inherit; text-decoration: none;">Mentions Légales</a>
     </div>
   </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('navMenu');
+      const burger = document.querySelector('.burger-menu');
+      menu.classList.toggle('active');
+      burger.classList.toggle('active');
+    }
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('active');
+        document.querySelector('.burger-menu').classList.remove('active');
+      });
+    });
+  </script>
 
 </body>
 </html>

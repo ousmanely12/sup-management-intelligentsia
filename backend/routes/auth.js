@@ -36,15 +36,23 @@ router.post('/login', async (req, res) => {
     let profileInfo = {};
 
     if (user.role === 'etudiant') {
+      // S'assurer que les colonnes existent
+      try {
+        await runQuery(`ALTER TABLE etudiants ADD COLUMN IF NOT EXISTS semestre TEXT DEFAULT 'S1'`);
+        await runQuery(`ALTER TABLE etudiants ADD COLUMN IF NOT EXISTS annee_academique TEXT DEFAULT '2024-2025'`);
+      } catch (e) { /* ignorer */ }
+      
       const etudiant = await getOne(
-        `SELECT id, filiere, niveau FROM etudiants WHERE user_id = $1`,
+        `SELECT id, filiere, niveau, semestre, annee_academique FROM etudiants WHERE user_id = $1`,
         [user.id]
       );
       if (etudiant) {
         profileId = etudiant.id;
         profileInfo = {
           filiere: etudiant.filiere,
-          niveau: etudiant.niveau
+          niveau: etudiant.niveau,
+          semestre: etudiant.semestre || 'S1',
+          annee_academique: etudiant.annee_academique || '2024-2025'
         };
       }
     } else if (user.role === 'professeur') {
@@ -139,8 +147,8 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ error: 'filière et niveau obligatoires.' });
       }
       await runQuery(
-        `INSERT INTO etudiants (user_id,filiere, niveau) VALUES ($1, $2, $3, $4)`,
-        [userId,  filiere, niveau]
+        `INSERT INTO etudiants (user_id, filiere, niveau) VALUES ($1, $2, $3)`,
+        [userId, filiere, niveau]
       );
     }
 
@@ -209,9 +217,9 @@ router.post('/register-etudiant', async (req, res) => {
     const numero_etudiant = 'ETU-' + Date.now();
 
     const etuResult = await runQuery(
-      `INSERT INTO etudiants (user_id, filiere, niveau, numero_etudiant)
-       VALUES ($1, $2, $3, $4) RETURNING id`,
-      [userId, filiere, niveau, numero_etudiant]
+      `INSERT INTO etudiants (user_id, filiere, niveau, numero_etudiant, semestre, annee_academique)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [userId, filiere, niveau, numero_etudiant, semestre || 'S2', annee_academique || '2025-2026']
     );
 
     const etuId = etuResult.lastID;

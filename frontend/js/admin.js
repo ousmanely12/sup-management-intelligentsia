@@ -9,10 +9,15 @@ if (user) {
   chargerCodes();
   chargerInscriptions();
   chargerStatutEval();
+  chargerCommentaires();
 }
 
 async function fetchAdmin(url, options = {}) {
-  const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/admin' + url, {
+  const base =
+    typeof API !== 'undefined'
+      ? API
+      : `${window.location.origin.replace(/\/$/, '')}/api`;
+  const res = await fetch(`${base}/admin` + url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -23,10 +28,28 @@ async function fetchAdmin(url, options = {}) {
   return res;
 }
 
+function apiBase() {
+  return typeof API !== 'undefined'
+    ? API
+    : `${window.location.origin.replace(/\/$/, '')}/api`;
+}
+
 async function chargerDashboard() {
   try {
-    const res = await fetchAdmin('/stats');
+    const semestre = document.getElementById('filter-semestre')?.value || 'S2';
+    const annee = document.getElementById('filter-annee')?.value || '2025-2026';
+    
+    // Afficher le loading
+    const loadingEl = document.getElementById('filter-loading');
+    if (loadingEl) loadingEl.style.opacity = '1';
+    
+    const res = await fetchAdmin(`/stats?semestre=${semestre}&annee_academique=${annee}`);
     const data = await res.json();
+    
+    // Mettre à jour le badge période
+    const badgePeriode = document.getElementById('badge-periode');
+    if (badgePeriode) badgePeriode.textContent = `${semestre} — ${annee}`;
+    
     document.getElementById('stat-profs').textContent = data.total_profs || 0;
     document.getElementById('stat-etudiants').textContent =
       data.total_etudiants || 0;
@@ -61,12 +84,21 @@ async function chargerDashboard() {
         <td style="text-align:center;">${parseFloat(p.moy_disponibilite || 0).toFixed(1)}</td>
         <td style="text-align:center;">${parseFloat(p.moy_supports || 0).toFixed(1)}</td>
         <td style="text-align:center;">${parseFloat(p.moy_ponctualite || 0).toFixed(1)}</td>
+        <td style="text-align:center;">${parseFloat(p.moy_engagement || 0).toFixed(1)}</td>
         <td style="${couleurMoy}">${moy}/5</td>
       </tr>`;
       })
       .join('');
+    
+    // Charger aussi les commentaires pour la même période
+    await chargerCommentaires();
+    
   } catch (err) {
     console.error('Erreur stats:', err);
+  } finally {
+    // Cacher le loading
+    const loadingEl = document.getElementById('filter-loading');
+    if (loadingEl) loadingEl.style.opacity = '0';
   }
 }
 
@@ -92,14 +124,18 @@ async function chargerUtilisateurs() {
             ${u.actif ? 'Actif' : 'Inactif'}
           </span>
         </td>
-        <td style="display:flex; gap:6px;">
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;"
-            onclick="ouvrirModalEdit(${u.id}, '${u.nom}', '${u.prenom}', '${u.email}')">
+        <td class="td-actions">
+          <button type="button" class="btn-action"
+            onclick='ouvrirModalEdit(${u.id}, ${JSON.stringify(u.nom)}, ${JSON.stringify(u.prenom)}, ${JSON.stringify(u.email)})'>
             Modifier
           </button>
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;"
+          <button type="button" class="btn-action"
             onclick="toggleUser(${u.id}, ${u.actif})">
             ${u.actif ? 'Désactiver' : 'Activer'}
+          </button>
+          <button type="button" class="btn-action btn-action--danger"
+            onclick="supprimerUser(${u.id})">
+            Supprimer
           </button>
         </td>
       </tr>`
@@ -143,6 +179,30 @@ async function toggleUser(userId, actifActuel) {
     chargerUtilisateurs();
   } catch (err) {
     console.error('Erreur toggle:', err);
+  }
+}
+
+async function supprimerUser(userId) {
+  if (
+    !confirm(
+      'Supprimer définitivement cet utilisateur ?\n\nLes données liées (profil, inscriptions, éventuellement évaluations) seront supprimées selon les règles de la base.'
+    )
+  ) {
+    return;
+  }
+  try {
+    const res = await fetchAdmin('/users/' + userId, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.error || 'Suppression impossible.');
+      return;
+    }
+    chargerUtilisateurs();
+    chargerSelectsInscription();
+    chargerDashboard();
+  } catch (err) {
+    console.error(err);
+    alert('Erreur serveur.');
   }
 }
 
@@ -206,7 +266,11 @@ async function creerUtilisateur() {
   };
 
   try {
-    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/auth/register', {
+    const base =
+      typeof API !== 'undefined'
+        ? API
+        : `${window.location.origin.replace(/\/$/, '')}/api`;
+    const res = await fetch(`${base}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -261,10 +325,14 @@ async function chargerCodes() {
               ${c.actif ? 'Actif' : 'Inactif'}
             </span>
           </td>
-          <td>
-            <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;"
+          <td class="td-actions">
+            <button type="button" class="btn-action"
               onclick="toggleCode(${c.id}, ${c.actif})">
               ${c.actif ? 'Désactiver' : 'Activer'}
+            </button>
+            <button type="button" class="btn-action btn-action--danger"
+              onclick='supprimerCode(${c.id}, ${JSON.stringify(c.code)})'>
+              Supprimer
             </button>
           </td>
         </tr>`
@@ -278,6 +346,28 @@ async function chargerCodes() {
 async function toggleCode(codeId, actifActuel) {
   await fetchAdmin('/codes/' + codeId + '/toggle', { method: 'PUT' });
   chargerCodes();
+}
+
+async function supprimerCode(codeId, codeLabel) {
+  if (
+    !confirm(
+      `Supprimer définitivement le code « ${codeLabel} » ?\n\nCette action est irréversible.`
+    )
+  ) {
+    return;
+  }
+  try {
+    const res = await fetchAdmin('/codes/' + codeId, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.error || 'Suppression impossible.');
+      return;
+    }
+    chargerCodes();
+  } catch (err) {
+    console.error(err);
+    alert('Erreur serveur.');
+  }
 }
 
 async function genererCode() {
@@ -337,10 +427,10 @@ async function chargerInscriptions() {
               ${e.profs
                 .map(
                   (p) => `
-                <span class="badge badge-gris" style="display:inline-flex;align-items:center;gap:4px;">
+                <span class="enroll-chip">
                   ${p.nom}
-                  <span onclick="supprimerInscription(${p.id})"
-                    style="cursor:pointer;color:var(--rouge);font-weight:700;font-size:13px;line-height:1;">×</span>
+                  <button type="button" class="enroll-chip-remove" title="Retirer l'inscription"
+                    onclick="supprimerInscription(${p.id})">×</button>
                 </span>`
                 )
                 .join('')}
@@ -376,7 +466,7 @@ async function supprimerInscription(enrollmentId) {
 async function chargerStatutEval() {
   try {
     const res = await fetch(
-      'https://sup-management-intelligentsia-dlw2.onrender.com/api/public/statut-evaluations'
+      `${apiBase()}/public/statut-evaluations`
     );
     const data = await res.json();
     mettreAJourStatutEval(data.ouvertes);
@@ -389,6 +479,7 @@ function mettreAJourStatutEval(ouvertes) {
   const badge = document.getElementById('badge-statut-eval');
   const btn = document.getElementById('btn-toggle-eval');
   const txt = document.getElementById('txt-statut-eval');
+  if (!badge || !btn || !txt) return;
 
   if (ouvertes) {
     badge.className = 'badge badge-vert';
@@ -412,7 +503,7 @@ function mettreAJourStatutEval(ouvertes) {
 async function toggleEvaluations() {
   try {
     const res = await fetch(
-      'https://sup-management-intelligentsia-dlw2.onrender.com/api/public/statut-evaluations'
+      `${apiBase()}/public/statut-evaluations`
     );
     const data = await res.json();
     const nouvelEtat = !data.ouvertes;
@@ -482,5 +573,51 @@ async function sauvegarderUser() {
   } catch (err) {
     errEl.textContent = 'Erreur serveur.';
     errEl.classList.add('show');
+  }
+}
+
+async function chargerCommentaires() {
+  try {
+    const semestre = document.getElementById('filter-semestre')?.value || 'S2';
+    const annee = document.getElementById('filter-annee')?.value || '2025-2026';
+    
+    const res = await fetchAdmin(`/commentaires?semestre=${semestre}&annee_academique=${annee}`);
+    const data = await res.json();
+    
+    const container = document.getElementById('admin-comments-list');
+    const badge = document.getElementById('badge-nb-comments');
+    
+    if (!data.commentaires || data.commentaires.length === 0) {
+      container.innerHTML = '<div class="dash-empty">Aucun commentaire pour cette période.</div>';
+      if (badge) badge.textContent = '0 commentaire';
+      return;
+    }
+    
+    if (badge) {
+      badge.textContent = data.commentaires.length + ' commentaire' + (data.commentaires.length > 1 ? 's' : '');
+    }
+    
+    container.innerHTML = data.commentaires.map(c => {
+      const moyenne = ((c.note_clarte + c.note_maitrise + c.note_disponibilite + c.note_supports + c.note_ponctualite + c.note_engagement) / 6).toFixed(1);
+      const date = new Date(c.created_at).toLocaleDateString('fr-FR');
+      
+      return `
+        <div class="dash-comment" style="border-left: 3px solid var(--bleu); padding-left: 12px; margin-bottom: 16px;">
+          <div style="font-size: 13px; color: var(--gris-text); margin-bottom: 4px;">
+            <strong>${c.prof_prenom} ${c.prof_nom}</strong> · ${c.matiere} · ${date}
+          </div>
+          <div style="font-style: italic; color: #334155; margin-bottom: 8px;">« ${c.commentaire} »</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px;">
+            <span class="badge badge-bleu" style="font-size: 11px;">⭐ ${moyenne}/5</span>
+            <span class="badge" style="font-size: 11px; background: #f1f5f9; color: #64748b;">Clarté: ${c.note_clarte}</span>
+            <span class="badge" style="font-size: 11px; background: #f1f5f9; color: #64748b;">Maîtrise: ${c.note_maitrise}</span>
+            <span class="badge" style="font-size: 11px; background: #f1f5f9; color: #64748b;">Engagement: ${c.note_engagement}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Erreur chargement commentaires:', err);
+    document.getElementById('admin-comments-list').innerHTML = '<div class="dash-empty">Erreur de chargement.</div>';
   }
 }

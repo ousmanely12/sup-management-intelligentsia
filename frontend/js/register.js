@@ -38,7 +38,21 @@ async function chargerProfs() {
 // Charger dès le départ
 chargerProfs();
 
+function updateStepIndicator(step) {
+  const s1 = document.getElementById('reg-step-indicator-1');
+  const s2 = document.getElementById('reg-step-indicator-2');
+  if (!s1 || !s2) return;
+  s1.classList.toggle('is-active', step === 1);
+  s2.classList.toggle('is-active', step === 2);
+}
+
 function passerEtape2() {
+  const code = document.getElementById('reg-code').value.trim();
+  if (!code) {
+    showAlert('error', "Code d'inscription requis.");
+    return;
+  }
+
   const nom = document.getElementById('reg-nom').value.trim();
   const prenom = document.getElementById('reg-prenom').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -65,14 +79,8 @@ function passerEtape2() {
   document.getElementById('alert-error').classList.remove('show');
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
+  updateStepIndicator(2);
 
-  const code = document.getElementById('reg-code').value.trim();
-  if (!code) {
-    showAlert('error', "Code d'inscription requis.");
-    return;
-  }
-
-  // Recharger si vide
   if (profsDisponibles.length === 0) {
     chargerProfs().then(() => afficherProfs());
   } else {
@@ -83,6 +91,7 @@ function passerEtape2() {
 function retourEtape1() {
   document.getElementById('step-2').style.display = 'none';
   document.getElementById('step-1').style.display = 'block';
+  updateStepIndicator(1);
 }
 
 function afficherProfs() {
@@ -90,11 +99,10 @@ function afficherProfs() {
 
   if (profsDisponibles.length === 0) {
     container.innerHTML = `
-      <div style="color:var(--gris-text);font-size:14px;padding:1rem;text-align:center;">
-        Aucun professeur disponible.<br>
-        <button onclick="chargerProfs().then(()=>afficherProfs())"
-          style="margin-top:8px;background:var(--bleu);color:white;border:none;
-          padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">
+      <div class="reg-empty-state">
+        Aucun professeur disponible pour le moment.
+        <br />
+        <button type="button" class="reg-retry-btn" onclick="chargerProfs().then(() => afficherProfs())">
           Réessayer
         </button>
       </div>`;
@@ -107,29 +115,17 @@ function afficherProfs() {
 
   profsDisponibles.forEach((p) => {
     const div = document.createElement('div');
-    div.style.cssText = `
-      display:flex; align-items:center; gap:12px;
-      padding:12px 14px;
-      border:1.5px solid var(--gris-border);
-      border-radius:var(--radius-sm);
-      cursor:pointer; transition:all 0.2s; background:white;
-      margin-bottom:2px;
-    `;
+    div.className = 'reg-prof-item';
 
     const checkBox = document.createElement('div');
+    checkBox.className = 'reg-prof-check';
     checkBox.id = 'check-' + p.id;
-    checkBox.style.cssText = `
-      width:20px; height:20px; border-radius:5px;
-      border:2px solid var(--gris-border);
-      display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; transition:all 0.2s;
-    `;
 
     const info = document.createElement('div');
     info.style.flex = '1';
     info.innerHTML = `
-      <div style="font-size:14px;font-weight:600;color:#1E293B;">${p.prenom} ${p.nom}</div>
-      <div style="font-size:12px;color:var(--gris-text);">${p.matiere}${p.departement ? ' · ' + p.departement : ''}</div>
+      <div class="reg-prof-info-name">${p.prenom} ${p.nom}</div>
+      <div class="reg-prof-info-meta">${p.matiere}${p.departement ? ' · ' + p.departement : ''}</div>
     `;
 
     div.appendChild(checkBox);
@@ -144,18 +140,12 @@ function toggleProf(profId, div) {
 
   if (profsSelectionnes.has(profId)) {
     profsSelectionnes.delete(profId);
-    div.style.borderColor = 'var(--gris-border)';
-    div.style.background = 'white';
-    check.style.borderColor = 'var(--gris-border)';
-    check.style.background = 'white';
+    div.classList.remove('is-selected');
     check.innerHTML = '';
   } else {
     profsSelectionnes.add(profId);
-    div.style.borderColor = 'var(--bleu)';
-    div.style.background = 'var(--bleu-light)';
-    check.style.borderColor = 'var(--bleu)';
-    check.style.background = 'var(--bleu)';
-    check.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12">
+    div.classList.add('is-selected');
+    check.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
       <polyline points="2,6 5,9 10,3" fill="none" stroke="white"
       stroke-width="2" stroke-linecap="round"/></svg>`;
   }

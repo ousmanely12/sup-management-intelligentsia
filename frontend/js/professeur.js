@@ -1,5 +1,12 @@
 const user = requireAuth('professeur');
 
+function escHtml(text) {
+  if (text == null) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
 if (user) {
   document.getElementById('nav-user').textContent =
     user.prenom + ' ' + user.nom;
@@ -8,10 +15,19 @@ if (user) {
   chargerDashboardProf();
 }
 
-async function chargerDashboardProf() {
+async function chargerDashboardProf(semestre = 'S2', annee_academique = '2025-2026') {
   const token = getToken();
+  const base =
+    typeof API !== 'undefined'
+      ? API
+      : `${window.location.origin.replace(/\/$/, '')}/api`;
+  
+  // Afficher le loading
+  const loadingEl = document.getElementById('filter-loading');
+  if (loadingEl) loadingEl.style.opacity = '1';
+  
   try {
-    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/professeur/dashboard', {
+    const res = await fetch(`${base}/professeur/dashboard?semestre=${semestre}&annee_academique=${annee_academique}`, {
       headers: { Authorization: 'Bearer ' + token },
     });
 
@@ -19,6 +35,9 @@ async function chargerDashboardProf() {
     console.log('Dashboard data:', data);
 
     if (!res.ok) throw new Error(data.error);
+
+    // Mettre à jour le badge semestre
+    document.getElementById('badge-semestre').textContent = `${semestre} — ${annee_academique}`;
 
     // Stats
     document.getElementById('stat-total').textContent =
@@ -36,13 +55,14 @@ async function chargerDashboardProf() {
       { key: 'moy_disponibilite', label: 'Disponibilité et écoute' },
       { key: 'moy_supports', label: 'Qualité des supports' },
       { key: 'moy_ponctualite', label: 'Ponctualité' },
+      { key: 'moy_engagement', label: 'Engagement pédagogique 🔥' },
     ];
 
     const chart = document.getElementById('bar-chart');
 
     if (!data.total_evaluations || data.total_evaluations === 0) {
       chart.innerHTML =
-        '<div style="color:var(--gris-text);font-size:14px;padding:1rem 0;">Aucune évaluation reçue pour le moment.</div>';
+        '<div class="dash-empty">Aucune évaluation reçue pour le moment.</div>';
     } else {
       chart.innerHTML = criteres
         .map((c) => {
@@ -69,14 +89,14 @@ async function chargerDashboardProf() {
 
     if (comments.length === 0) {
       commentsList.innerHTML =
-        '<div style="color:var(--gris-text);font-size:14px;">Aucun commentaire pour le moment.</div>';
+        '<div class="dash-empty">Aucun commentaire pour le moment.</div>';
     } else {
       commentsList.innerHTML = comments
         .map(
           (c) => `
-        <div style="background:#F5F7FA; border-radius:8px; padding:12px 14px; font-size:14px; color:#424242; border-left:3px solid var(--bleu); margin-bottom:8px;">
-          <div>"${c.commentaire}"</div>
-          <div style="font-size:11px; color:var(--gris-text); margin-top:6px;">${c.created_at}</div>
+        <div class="dash-comment">
+          <div>« ${escHtml(c.commentaire)} »</div>
+          <div class="dash-comment-meta">${c.created_at || ''}</div>
         </div>`
         )
         .join('');
@@ -84,8 +104,19 @@ async function chargerDashboardProf() {
   } catch (err) {
     console.error('Erreur dashboard prof:', err);
     document.getElementById('bar-chart').innerHTML =
-      '<div style="color:red;font-size:14px;">Erreur de chargement : ' +
+      '<div class="dash-empty" style="color:var(--rouge)">Erreur de chargement : ' +
       err.message +
       '</div>';
+  } finally {
+    // Cacher le loading
+    const loadingEl = document.getElementById('filter-loading');
+    if (loadingEl) loadingEl.style.opacity = '0';
   }
+}
+
+// Fonction appelée quand on change les filtres
+function chargerDashboardProfFiltre() {
+  const semestre = document.getElementById('filter-semestre').value;
+  const annee = document.getElementById('filter-annee').value;
+  chargerDashboardProf(semestre, annee);
 }

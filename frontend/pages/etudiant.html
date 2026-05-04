@@ -6,7 +6,7 @@
     <title>Espace Étudiant — Sup Management</title>
     <link rel="stylesheet" href="../css/style.css" />
   </head>
-  <body>
+  <body class="app-dashboard">
     <nav class="navbar">
       <div class="navbar-brand">
         <img
@@ -18,6 +18,7 @@
       <div class="navbar-right">
         <span class="navbar-user" id="nav-user">Chargement...</span>
         <button
+          type="button"
           class="btn-logout"
           onclick="ouvrirModalPassword()"
           style="
@@ -29,16 +30,19 @@
         >
           Mot de passe
         </button>
-        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        <button type="button" class="btn-logout" onclick="logout()">
+          Déconnexion
+        </button>
       </div>
     </nav>
 
-    <!-- Modal changement mot de passe -->
     <div class="modal-overlay" id="modal-password">
       <div class="modal" style="max-width: 420px">
         <div class="modal-header">
           <h3>Changer le mot de passe</h3>
-          <button class="modal-close" onclick="fermerModalPassword()">×</button>
+          <button type="button" class="modal-close" onclick="fermerModalPassword()">
+            ×
+          </button>
         </div>
         <div class="modal-body">
           <div class="alert alert-error" id="pwd-alert-error"></div>
@@ -61,10 +65,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="fermerModalPassword()">
+          <button type="button" class="btn btn-outline" onclick="fermerModalPassword()">
             Annuler
           </button>
           <button
+            type="button"
             class="btn btn-primary"
             style="width: auto"
             onclick="changerMotDePasse()"
@@ -76,40 +81,42 @@
     </div>
 
     <div class="dashboard">
-      <div class="dashboard-header">
-        <div class="dashboard-title" id="welcome-title">Bonjour !</div>
-        <div class="dashboard-sub" id="welcome-sub">
-          Évaluez vos professeurs — vos notes sont totalement anonymes
+      <header class="dash-hero">
+        <div class="dash-hero-inner">
+          <span class="dash-kicker">Évaluation anonyme</span>
+          <div class="dashboard-header">
+            <h1 class="dashboard-title" id="welcome-title">Bonjour !</h1>
+            <p class="dashboard-sub" id="welcome-sub">
+              Évaluez vos professeurs — vos notes sont totalement anonymes.
+            </p>
+            <div class="dash-badges">
+              <span class="badge badge-bleu" id="badge-filiere"></span>
+              <span class="badge badge-orange" id="badge-niveau"></span>
+              <span class="badge badge-gris" id="badge-semestre">S2 — 2025-2026</span>
+              <button class="btn btn-orange btn-sm" onclick="ouvrirModalMiseAJour()">
+                🔄 Mettre à jour
+              </button>
+            </div>
+          </div>
         </div>
-        <div style="display: flex; gap: 8px; margin-top: 10px">
-          <span class="badge badge-bleu" id="badge-filiere"></span>
-          <span class="badge badge-orange" id="badge-niveau"></span>
-          <span class="badge badge-gris" id="badge-semestre"
-            >S2 — 2025-2026</span
-          >
-        </div>
-      </div>
+      </header>
 
-      <!-- Liste des profs -->
       <div class="section-card">
         <div class="section-card-header">
-          <h2>Tous les professeurs</h2>
+          <h2>📚 Tous les professeurs</h2>
           <span class="badge badge-orange" id="badge-count">Chargement...</span>
         </div>
         <div class="prof-grid" id="prof-grid">
-          <div style="padding: 1rem; color: var(--gris-text)">
-            Chargement...
-          </div>
+          <div class="dash-empty">Chargement...</div>
         </div>
       </div>
     </div>
 
-    <!-- Modal de notation -->
     <div class="modal-overlay" id="modal-notation">
       <div class="modal">
         <div class="modal-header">
           <h3 id="modal-prof-nom">Évaluer le professeur</h3>
-          <button class="modal-close" onclick="fermerModal()">×</button>
+          <button type="button" class="modal-close" onclick="fermerModal()">×</button>
         </div>
         <div class="modal-body">
           <div class="alert alert-error" id="modal-alert-error"></div>
@@ -123,19 +130,11 @@
 
           <div class="critere-row">
             <div class="critere-label">Clarté des explications</div>
-            <div
-              class="stars-input"
-              id="stars-clarte"
-              data-critere="clarte"
-            ></div>
+            <div class="stars-input" id="stars-clarte" data-critere="clarte"></div>
           </div>
           <div class="critere-row">
             <div class="critere-label">Maîtrise du sujet</div>
-            <div
-              class="stars-input"
-              id="stars-maitrise"
-              data-critere="maitrise"
-            ></div>
+            <div class="stars-input" id="stars-maitrise" data-critere="maitrise"></div>
           </div>
           <div class="critere-row">
             <div class="critere-label">Disponibilité et écoute</div>
@@ -147,11 +146,7 @@
           </div>
           <div class="critere-row">
             <div class="critere-label">Qualité des supports</div>
-            <div
-              class="stars-input"
-              id="stars-supports"
-              data-critere="supports"
-            ></div>
+            <div class="stars-input" id="stars-supports" data-critere="supports"></div>
           </div>
           <div class="critere-row">
             <div class="critere-label">Ponctualité</div>
@@ -159,6 +154,14 @@
               class="stars-input"
               id="stars-ponctualite"
               data-critere="ponctualite"
+            ></div>
+          </div>
+          <div class="critere-row">
+            <div class="critere-label">Engagement pédagogique</div>
+            <div
+              class="stars-input"
+              id="stars-engagement"
+              data-critere="engagement"
             ></div>
           </div>
 
@@ -172,16 +175,83 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="fermerModal()">
+          <button type="button" class="btn btn-outline" onclick="fermerModal()">
             Annuler
           </button>
           <button
+            type="button"
             class="btn btn-primary"
             id="btn-soumettre"
             onclick="soumettreEvaluation()"
             style="width: auto"
           >
             Envoyer l'évaluation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de mise à jour du semestre -->
+    <div class="modal-overlay" id="modal-miseajour">
+      <div class="modal" style="max-width: 600px">
+        <div class="modal-header">
+          <h3>🔄 Mettre à jour votre semestre</h3>
+          <button type="button" class="modal-close" onclick="fermerModalMiseAJour()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-error" id="maj-alert-error"></div>
+          <div class="alert alert-success" id="maj-alert-success"></div>
+          
+          <div class="form-group">
+            <label for="maj-semestre">Nouveau semestre</label>
+            <select id="maj-semestre" required>
+              <option value="">Sélectionner un semestre</option>
+              <option value="S1">Semestre 1</option>
+              <option value="S2">Semestre 2</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="maj-annee">Nouvelle année académique</label>
+            <select id="maj-annee" required>
+              <option value="">Sélectionner une année</option>
+              <option value="2024-2025">2024-2025</option>
+              <option value="2025-2026">2025-2026</option>
+              <option value="2026-2027">2026-2027</option>
+              <option value="2027-2028">2027-2028</option>
+              <option value="2028-2029">2028-2029</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Nouveau niveau d'études</label>
+            <select id="maj-niveau" required>
+              <option value="">Sélectionner un niveau</option>
+              <option value="L1">Licence 1</option>
+              <option value="L2">Licence 2</option>
+              <option value="L3">Licence 3</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Sélectionnez vos professeurs pour ce semestre</label>
+            <div id="maj-profs-list" class="maj-profs-container">
+              <div class="maj-loading">Chargement des professeurs...</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="fermerModalMiseAJour()">
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btn-valider-maj"
+            onclick="validerMiseAJour()"
+            style="width: auto"
+          >
+            Valider la mise à jour
           </button>
         </div>
       </div>

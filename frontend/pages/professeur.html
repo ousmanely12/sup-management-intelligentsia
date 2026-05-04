@@ -1,108 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espace Professeur — Sup Management</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <img src="../logo_SMI.png" alt="SMI Logo" 
-        style="height:42px; width:auto; filter:brightness(0) invert(1);">
-    </div>
-    <div class="navbar-right">
-      <span class="navbar-user" id="nav-user">Chargement...</span>
-      <button class="btn-logout" onclick="ouvrirModalPassword()"
-        style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);margin-right:4px;">
-        Mot de passe
-      </button>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
-  
-  <!-- Modal changement mot de passe -->
-  <div class="modal-overlay" id="modal-password">
-    <div class="modal" style="max-width:420px;">
-      <div class="modal-header">
-        <h3>Changer le mot de passe</h3>
-        <button class="modal-close" onclick="fermerModalPassword()">×</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Espace Professeur — Sup Management</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body class="app-dashboard">
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <img
+          src="../logo_SMI.png"
+          alt="SMI Logo"
+          style="height: 42px; width: auto; filter: brightness(0) invert(1)"
+        />
       </div>
-      <div class="modal-body">
-        <div class="alert alert-error" id="pwd-alert-error"></div>
-        <div class="alert alert-success" id="pwd-alert-success"></div>
-        <div class="form-group">
-          <label>Ancien mot de passe</label>
-          <input type="password" id="pwd-ancien" placeholder="••••••••">
-        </div>
-        <div class="form-group">
-          <label>Nouveau mot de passe</label>
-          <input type="password" id="pwd-nouveau" placeholder="minimum 6 caractères">
-        </div>
-        <div class="form-group">
-          <label>Confirmer le nouveau mot de passe</label>
-          <input type="password" id="pwd-confirmer" placeholder="••••••••">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="fermerModalPassword()">Annuler</button>
-        <button class="btn btn-primary" style="width:auto;" onclick="changerMotDePasse()">
-          Modifier
+      <div class="navbar-right">
+        <span class="navbar-user" id="nav-user">Chargement...</span>
+        <button
+          type="button"
+          class="btn-logout"
+          onclick="ouvrirModalPassword()"
+          style="
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-right: 4px;
+          "
+        >
+          Mot de passe
         </button>
+        <button type="button" class="btn-logout" onclick="logout()">Déconnexion</button>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <div class="dashboard">
-    <div class="dashboard-title" id="welcome-title">Bonjour !</div>
-    <div class="dashboard-sub" id="welcome-sub">Voici vos évaluations anonymes</div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-val" id="stat-total">--</div>
-        <div class="stat-label">Évaluations reçues</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-val" id="stat-moyenne">--</div>
-        <div class="stat-label">Note moyenne générale</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="stat-etudiants">--</div>
-        <div class="stat-label">Étudiants inscrits</div>
-      </div>
-    </div>
-
-    <!-- Graphique des critères -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2>Résultats par critère</h2>
-        <span class="badge badge-bleu" id="badge-semestre">S2 — 2025-2026</span>
-      </div>
-      <div style="padding: 1.5rem;">
-        <div class="bar-chart" id="bar-chart">
-          <div style="color: var(--gris-text); font-size:14px;">Chargement des données...</div>
+    <div class="modal-overlay" id="modal-password">
+      <div class="modal" style="max-width: 420px">
+        <div class="modal-header">
+          <h3>Changer le mot de passe</h3>
+          <button type="button" class="modal-close" onclick="fermerModalPassword()">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-error" id="pwd-alert-error"></div>
+          <div class="alert alert-success" id="pwd-alert-success"></div>
+          <div class="form-group">
+            <label>Ancien mot de passe</label>
+            <input type="password" id="pwd-ancien" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label>Nouveau mot de passe</label>
+            <input
+              type="password"
+              id="pwd-nouveau"
+              placeholder="minimum 6 caractères"
+            />
+          </div>
+          <div class="form-group">
+            <label>Confirmer le nouveau mot de passe</label>
+            <input type="password" id="pwd-confirmer" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="fermerModalPassword()">
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="changerMotDePasse()"
+          >
+            Modifier
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Commentaires anonymes -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2>Commentaires des étudiants</h2>
-        <span class="badge badge-gris" id="badge-nb-comments">0 commentaire</span>
+    <div class="dashboard">
+      <header class="dash-hero">
+        <div class="dash-hero-inner">
+          <span class="dash-kicker">Synthèse pédagogique</span>
+          <h1 class="dashboard-title" id="welcome-title">Bonjour !</h1>
+          <p class="dashboard-sub" id="welcome-sub">
+            Retours anonymes agrégés sur vos cours — pour vous aider à progresser.
+          </p>
+        </div>
+      </header>
+
+      <!-- Sélecteurs de filtrage dynamique -->
+      <div class="filter-section" style="margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 248, 255, 0.8) 100%); border-radius: var(--radius-lg); border: 1px solid rgba(226, 232, 244, 0.8);">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <span style="font-weight: 600; color: var(--bleu-deep); font-size: 14px;">📅 Filtrer par période :</span>
+          <select id="filter-semestre" onchange="chargerDashboardProfFiltre()" style="padding: 0.6rem 1rem; border: 1px solid var(--gris-border); border-radius: var(--radius-sm); background: white; font-size: 14px; cursor: pointer; min-width: 120px;">
+            <option value="S1">Semestre 1</option>
+            <option value="S2" selected>Semestre 2</option>
+          </select>
+          <select id="filter-annee" onchange="chargerDashboardProfFiltre()" style="padding: 0.6rem 1rem; border: 1px solid var(--gris-border); border-radius: var(--radius-sm); background: white; font-size: 14px; cursor: pointer; min-width: 140px;">
+            <option value="2024-2025">2024-2025</option>
+            <option value="2025-2026" selected>2025-2026</option>
+            <option value="2026-2027">2026-2027</option>
+          </select>
+          <span id="filter-loading" style="font-size: 12px; color: var(--gris-text); opacity: 0; transition: opacity 0.3s;">Chargement...</span>
+        </div>
       </div>
-      <div id="comments-list" style="padding: 1rem 1.5rem; display:flex; flex-direction:column; gap:10px;">
-        <div style="color: var(--gris-text); font-size:14px;">Aucun commentaire pour le moment.</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-val" id="stat-total">--</div>
+          <div class="stat-label">Évaluations reçues</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-val" id="stat-moyenne">--</div>
+          <div class="stat-label">Note moyenne générale</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-val" id="stat-etudiants">--</div>
+          <div class="stat-label">Étudiants inscrits</div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Résultats par critère</h2>
+          <span class="badge badge-bleu" id="badge-semestre">Chargement...</span>
+        </div>
+        <div class="bar-chart-panel">
+          <div class="bar-chart" id="bar-chart">
+            <div class="dash-empty">Chargement des données...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Commentaires des étudiants</h2>
+          <span class="badge badge-gris" id="badge-nb-comments">0 commentaire</span>
+        </div>
+        <div class="dash-comments" id="comments-list">
+          <div class="dash-empty">Aucun commentaire pour le moment.</div>
+        </div>
       </div>
     </div>
 
-  </div>
-
-  <script src="../js/auth.js"></script>
-  <script src="../js/professeur.js"></script>
-  <script src="../js/password.js"></script>
-</body>
+    <script src="../js/auth.js"></script>
+    <script src="../js/professeur.js"></script>
+    <script src="../js/password.js"></script>
+  </body>
 </html>

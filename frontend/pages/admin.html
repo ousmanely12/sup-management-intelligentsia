@@ -6,7 +6,7 @@
     <title>Espace Admin — Sup Management</title>
     <link rel="stylesheet" href="../css/style.css" />
   </head>
-  <body>
+  <body class="app-dashboard">
     <nav class="navbar">
       <div class="navbar-brand">
         <img
@@ -18,6 +18,7 @@
       <div class="navbar-right">
         <span class="navbar-user" id="nav-user">Chargement...</span>
         <button
+          type="button"
           class="btn-logout"
           onclick="ouvrirModalPassword()"
           style="
@@ -29,16 +30,19 @@
         >
           Mot de passe
         </button>
-        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        <button type="button" class="btn-logout" onclick="logout()">
+          Déconnexion
+        </button>
       </div>
     </nav>
 
-    <!-- Modal changement mot de passe -->
     <div class="modal-overlay" id="modal-password">
       <div class="modal" style="max-width: 420px">
         <div class="modal-header">
           <h3>Changer le mot de passe</h3>
-          <button class="modal-close" onclick="fermerModalPassword()">×</button>
+          <button type="button" class="modal-close" onclick="fermerModalPassword()">
+            ×
+          </button>
         </div>
         <div class="modal-body">
           <div class="alert alert-error" id="pwd-alert-error"></div>
@@ -61,10 +65,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="fermerModalPassword()">
+          <button type="button" class="btn btn-outline" onclick="fermerModalPassword()">
             Annuler
           </button>
           <button
+            type="button"
             class="btn btn-primary"
             style="width: auto"
             onclick="changerMotDePasse()"
@@ -74,11 +79,36 @@
         </div>
       </div>
     </div>
-    <div class="dashboard">
-      <div class="dashboard-title">Tableau de bord administrateur</div>
-      <div class="dashboard-sub">Gestion complète de l'application</div>
 
-      <!-- Stats globales -->
+    <div class="dashboard">
+      <header class="dash-hero">
+        <div class="dash-hero-inner">
+          <span class="dash-kicker">Administration</span>
+          <h1 class="dashboard-title">Tableau de bord</h1>
+          <p class="dashboard-sub">
+            Statistiques, utilisateurs, inscriptions et codes d’accès — tout
+            centralisé pour piloter SMI PULSE.
+          </p>
+        </div>
+      </header>
+
+      <!-- Sélecteurs de filtrage par période -->
+      <div class="filter-section" style="margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 248, 255, 0.8) 100%); border-radius: var(--radius-lg); border: 1px solid rgba(226, 232, 244, 0.8);">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <span style="font-weight: 600; color: var(--bleu-deep); font-size: 14px;"> Filtrer par période :</span>
+          <select id="filter-semestre" onchange="chargerDashboard()" style="padding: 0.6rem 1rem; border: 1px solid var(--gris-border); border-radius: var(--radius-sm); background: white; font-size: 14px; cursor: pointer; min-width: 120px;">
+            <option value="S1">Semestre 1</option>
+            <option value="S2" selected>Semestre 2</option>
+          </select>
+          <select id="filter-annee" onchange="chargerDashboard()" style="padding: 0.6rem 1rem; border: 1px solid var(--gris-border); border-radius: var(--radius-sm); background: white; font-size: 14px; cursor: pointer; min-width: 140px;">
+            <option value="2024-2025">2024-2025</option>
+            <option value="2025-2026" selected>2025-2026</option>
+            <option value="2026-2027">2026-2027</option>
+          </select>
+          <span id="filter-loading" style="font-size: 12px; color: var(--gris-text); opacity: 0; transition: opacity 0.3s;">Chargement...</span>
+        </div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-val" id="stat-profs">--</div>
@@ -98,14 +128,10 @@
         </div>
       </div>
 
-    
-      
-
-      <!-- Classement des professeurs -->
       <div class="section-card">
         <div class="section-card-header">
           <h2>Classement des professeurs</h2>
-          <span class="badge badge-bleu">S2 — 2025-2026</span>
+          <span class="badge badge-bleu" id="badge-periode">S2 — 2025-2026</span>
         </div>
         <div class="table-wrap">
           <table id="table-profs">
@@ -120,15 +146,13 @@
                 <th>Dispo.</th>
                 <th>Supports</th>
                 <th>Ponctualité</th>
+                <th>Engagement</th>
                 <th>Moyenne</th>
               </tr>
             </thead>
             <tbody id="tbody-profs">
               <tr>
-                <td
-                  colspan="10"
-                  style="text-align: center; color: var(--gris-text)"
-                >
+                <td colspan="11" class="dash-empty" style="text-align: center">
                   Chargement...
                 </td>
               </tr>
@@ -137,11 +161,10 @@
         </div>
       </div>
 
-      <!-- Gestion utilisateurs -->
       <div class="section-card">
         <div class="section-card-header">
           <h2>Gestion des utilisateurs</h2>
-          <button class="btn btn-orange" onclick="ouvrirModalUser()">
+          <button type="button" class="btn btn-orange" onclick="ouvrirModalUser()">
             + Ajouter
           </button>
         </div>
@@ -153,15 +176,12 @@
                 <th>Email</th>
                 <th>Rôle</th>
                 <th>Statut</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="tbody-users">
               <tr>
-                <td
-                  colspan="5"
-                  style="text-align: center; color: var(--gris-text)"
-                >
+                <td colspan="5" class="dash-empty" style="text-align: center">
                   Chargement...
                 </td>
               </tr>
@@ -170,48 +190,35 @@
         </div>
       </div>
 
-      <!-- Gestion inscriptions -->
-      <!-- Gestion inscriptions -->
       <div class="section-card">
         <div class="section-card-header">
           <h2>Inscrire un étudiant à un professeur</h2>
         </div>
-        <div
-          style="
-            padding: 1.5rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: flex-end;
-          "
-        >
-          <div class="form-group" style="margin: 0; flex: 1; min-width: 200px">
-            <label>Étudiant</label>
+        <div class="dash-toolbar">
+          <div class="form-group">
+            <label for="sel-etudiant">Étudiant</label>
             <select id="sel-etudiant"></select>
           </div>
-          <div class="form-group" style="margin: 0; flex: 1; min-width: 200px">
-            <label>Professeur</label>
+          <div class="form-group">
+            <label for="sel-prof">Professeur</label>
             <select id="sel-prof"></select>
           </div>
           <button
+            type="button"
             class="btn btn-primary"
-            style="width: auto"
+            style="width: auto; align-self: flex-end"
             onclick="inscrireEtudiant()"
           >
             Inscrire
           </button>
         </div>
-        <div
-          id="enroll-msg"
-          style="padding: 0 1.5rem 1rem; font-size: 13px"
-        ></div>
+        <div id="enroll-msg" class="dash-msg"></div>
       </div>
 
-      <!-- Liste des inscriptions -->
       <div class="section-card">
         <div class="section-card-header">
           <h2>Inscriptions actuelles</h2>
-          <button class="btn btn-outline" onclick="chargerInscriptions()">
+          <button type="button" class="btn btn-outline" onclick="chargerInscriptions()">
             Actualiser
           </button>
         </div>
@@ -228,10 +235,7 @@
             </thead>
             <tbody id="tbody-inscriptions">
               <tr>
-                <td
-                  colspan="5"
-                  style="text-align: center; color: var(--gris-text)"
-                >
+                <td colspan="5" class="dash-empty" style="text-align: center">
                   Chargement...
                 </td>
               </tr>
@@ -240,11 +244,20 @@
         </div>
       </div>
 
-      <!-- Gestion codes d'inscription -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Commentaires des étudiants</h2>
+          <span class="badge badge-gris" id="badge-nb-comments">0 commentaire</span>
+        </div>
+        <div class="dash-comments" id="admin-comments-list" style="max-height: 400px; overflow-y: auto;">
+          <div class="dash-empty">Chargement des commentaires...</div>
+        </div>
+      </div>
+
       <div class="section-card">
         <div class="section-card-header">
           <h2>Codes d'inscription</h2>
-          <button class="btn btn-orange" onclick="genererCode()">
+          <button type="button" class="btn btn-orange" onclick="genererCode()">
             + Nouveau code
           </button>
         </div>
@@ -256,15 +269,12 @@
                 <th>Description</th>
                 <th>Utilisations</th>
                 <th>Statut</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="tbody-codes">
               <tr>
-                <td
-                  colspan="5"
-                  style="text-align: center; color: var(--gris-text)"
-                >
+                <td colspan="5" class="dash-empty" style="text-align: center">
                   Chargement...
                 </td>
               </tr>
@@ -274,37 +284,36 @@
       </div>
     </div>
 
-    <!-- Modal ajout utilisateur -->
     <div class="modal-overlay" id="modal-user">
       <div class="modal">
         <div class="modal-header">
           <h3>Ajouter un utilisateur</h3>
-          <button class="modal-close" onclick="fermerModalUser()">×</button>
+          <button type="button" class="modal-close" onclick="fermerModalUser()">×</button>
         </div>
         <div class="modal-body">
           <div class="alert alert-error" id="modal-user-error"></div>
           <div class="alert alert-success" id="modal-user-success"></div>
 
           <div class="form-group">
-            <label>Rôle</label>
+            <label for="new-role">Rôle</label>
             <select id="new-role" onchange="toggleChampsRole()">
               <option value="etudiant">Étudiant</option>
               <option value="professeur">Professeur</option>
               <option value="admin">Admin</option>
             </select>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <div class="form-row-2">
             <div class="form-group">
-              <label>Nom</label>
+              <label for="new-nom">Nom</label>
               <input type="text" id="new-nom" placeholder="Diallo" />
             </div>
             <div class="form-group">
-              <label>Prénom</label>
+              <label for="new-prenom">Prénom</label>
               <input type="text" id="new-prenom" placeholder="Mamadou" />
             </div>
           </div>
           <div class="form-group">
-            <label>Email</label>
+            <label for="new-email">Email</label>
             <input
               type="email"
               id="new-email"
@@ -312,7 +321,7 @@
             />
           </div>
           <div class="form-group">
-            <label>Mot de passe</label>
+            <label for="new-password">Mot de passe</label>
             <input
               type="password"
               id="new-password"
@@ -320,10 +329,9 @@
             />
           </div>
 
-          <!-- Champs professeur -->
           <div id="champs-prof">
             <div class="form-group">
-              <label>Matière enseignée</label>
+              <label for="new-matiere">Matière enseignée</label>
               <input
                 type="text"
                 id="new-matiere"
@@ -331,40 +339,34 @@
               />
             </div>
             <div class="form-group">
-              <label>Département</label>
-              <input
-                type="text"
-                id="new-departement"
-                placeholder="Management"
-              />
+              <label for="new-departement">Département</label>
+              <input type="text" id="new-departement" placeholder="Management" />
             </div>
           </div>
 
-          <!-- Champs étudiant -->
           <div id="champs-etudiant" style="display: none">
             <div class="form-group">
-              <label>Numéro étudiant</label>
+              <label for="new-numero">Numéro étudiant</label>
               <input type="text" id="new-numero" placeholder="ETU-2024-003" />
             </div>
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
-            >
+            <div class="form-row-2">
               <div class="form-group">
-                <label>Filière</label>
+                <label for="new-filiere">Filière</label>
                 <input type="text" id="new-filiere" placeholder="Management" />
               </div>
               <div class="form-group">
-                <label>Niveau</label>
+                <label for="new-niveau">Niveau</label>
                 <input type="text" id="new-niveau" placeholder="Licence 3" />
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="fermerModalUser()">
+          <button type="button" class="btn btn-outline" onclick="fermerModalUser()">
             Annuler
           </button>
           <button
+            type="button"
             class="btn btn-primary"
             style="width: auto"
             onclick="creerUtilisateur()"
@@ -375,37 +377,37 @@
       </div>
     </div>
 
-    <!-- Modal modifier utilisateur -->
     <div class="modal-overlay" id="modal-edit-user">
       <div class="modal" style="max-width: 420px">
         <div class="modal-header">
           <h3>Modifier l'utilisateur</h3>
-          <button class="modal-close" onclick="fermerModalEdit()">×</button>
+          <button type="button" class="modal-close" onclick="fermerModalEdit()">×</button>
         </div>
         <div class="modal-body">
           <div class="alert alert-error" id="edit-alert-error"></div>
           <div class="alert alert-success" id="edit-alert-success"></div>
           <input type="hidden" id="edit-user-id" />
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <div class="form-row-2">
             <div class="form-group">
-              <label>Nom</label>
+              <label for="edit-nom">Nom</label>
               <input type="text" id="edit-nom" />
             </div>
             <div class="form-group">
-              <label>Prénom</label>
+              <label for="edit-prenom">Prénom</label>
               <input type="text" id="edit-prenom" />
             </div>
           </div>
           <div class="form-group">
-            <label>Email</label>
+            <label for="edit-email">Email</label>
             <input type="email" id="edit-email" />
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" onclick="fermerModalEdit()">
+          <button type="button" class="btn btn-outline" onclick="fermerModalEdit()">
             Annuler
           </button>
           <button
+            type="button"
             class="btn btn-primary"
             style="width: auto"
             onclick="sauvegarderUser()"

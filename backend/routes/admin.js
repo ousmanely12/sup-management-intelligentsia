@@ -8,29 +8,41 @@ router.use(requireRole('admin'));
 
 router.get('/stats', async (req, res) => {
   try {
+    const { semestre, annee_academique } = req.query;
+    const semestreFilter = semestre || 'S2';
+    const anneeFilter = annee_academique || '2025-2026';
+    
     const total_profs = await getOne(`SELECT COUNT(*) AS n FROM professeurs`);
     const total_etudiants = await getOne(`SELECT COUNT(*) AS n FROM etudiants`);
-    const total_evals = await getOne(`SELECT COUNT(*) AS n FROM evaluations`);
+    const total_evals = await getOne(`
+      SELECT COUNT(*) AS n FROM evaluations 
+      WHERE semestre = $1 AND annee_academique = $2
+    `, [semestreFilter, anneeFilter]);
+    
     const moy = await getOne(`
-      SELECT ROUND(AVG((note_clarte+note_maitrise+note_disponibilite+note_supports+note_ponctualite)/5.0),2) AS moy
-      FROM evaluations`);
+      SELECT ROUND(AVG((note_clarte+note_maitrise+note_disponibilite+note_supports+note_ponctualite+note_engagement)/6.0),2) AS moy
+      FROM evaluations
+      WHERE semestre = $1 AND annee_academique = $2
+    `, [semestreFilter, anneeFilter]);
 
     const classement = await getAll(`
       SELECT
         u.nom, u.prenom, p.matiere,
         COUNT(e.id) AS total_evaluations,
-        ROUND(AVG((e.note_clarte+e.note_maitrise+e.note_disponibilite+e.note_supports+e.note_ponctualite)/5.0),2) AS moyenne_generale,
+        ROUND(AVG((e.note_clarte+e.note_maitrise+e.note_disponibilite+e.note_supports+e.note_ponctualite+e.note_engagement)/6.0),2) AS moyenne_generale,
         ROUND(AVG(e.note_clarte),2) AS moy_clarte,
         ROUND(AVG(e.note_maitrise),2) AS moy_maitrise,
         ROUND(AVG(e.note_disponibilite),2) AS moy_disponibilite,
         ROUND(AVG(e.note_supports),2) AS moy_supports,
-        ROUND(AVG(e.note_ponctualite),2) AS moy_ponctualite
+        ROUND(AVG(e.note_ponctualite),2) AS moy_ponctualite,
+        ROUND(AVG(e.note_engagement),2) AS moy_engagement
       FROM professeurs p
       JOIN users u ON p.user_id = u.id
-      LEFT JOIN evaluations e ON e.professeur_id = p.id
+      LEFT JOIN evaluations e ON e.professeur_id = p.id 
+        AND e.semestre = $1 AND e.annee_academique = $2
       GROUP BY p.id, u.nom, u.prenom, p.matiere
       ORDER BY moyenne_generale DESC NULLS LAST
-    `);
+    `, [semestreFilter, anneeFilter]);
 
     res.json({
       total_profs: total_profs.n,
@@ -88,6 +100,45 @@ router.put('/users/:id/toggle', async (req, res) => {
   }
 });
 
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Identifiant invalide.' });
+    }
+    if (id === req.user.userId) {
+      return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte.' });
+    }
+    const target = await getOne(`SELECT id, role FROM users WHERE id = $1`, [id]);
+    if (!target) {
+      return res.status(404).json({ error: 'Utilisateur introuvable.' });
+    }
+    if (target.role === 'admin') {
+      const row = await getOne(
+        `SELECT CAST(COUNT(*) AS INTEGER) AS n FROM users WHERE role = 'admin'`
+      );
+      const n = row ? parseInt(row.n, 10) : 0;
+      if (n <= 1) {
+        return res.status(400).json({ error: 'Impossible de supprimer le dernier administrateur.' });
+      }
+    }
+
+    // ON DELETE CASCADE s'occupera automatiquement des enregistrements liés
+    if (target.role === 'professeur') {
+      await runQuery(`DELETE FROM professeurs WHERE user_id = $1`, [id]);
+    } else if (target.role === 'etudiant') {
+      await runQuery(`DELETE FROM etudiants WHERE user_id = $1`, [id]);
+    }
+
+    // Supprimer l'utilisateur
+    await runQuery(`DELETE FROM users WHERE id = $1`, [id]);
+    res.json({ message: 'Utilisateur supprimé.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur serveur lors de la suppression.' });
+  }
+});
+
 router.get('/etudiants', async (req, res) => {
   try {
     const etudiants = await getAll(`
@@ -115,14 +166,32 @@ router.get('/professeurs', async (req, res) => {
 router.post('/inscrire', async (req, res) => {
   try {
     const { etudiant_id, professeur_id, semestre, annee_academique } = req.body;
+    
+    // Validation des IDs
+    const etuId = parseInt(etudiant_id, 10);
+    const profId = parseInt(professeur_id, 10);
+    if (Number.isNaN(etuId) || Number.isNaN(profId)) {
+      return res.status(400).json({ error: 'IDs invalides.' });
+    }
+    
+    // Validation du semestre
+    if (!semestre || !['S1', 'S2'].includes(semestre)) {
+      return res.status(400).json({ error: 'Semestre invalide (S1 ou S2).' });
+    }
+    
+    // Validation de l'année académique
+    if (!annee_academique || !/^\d{4}-\d{4}$/.test(annee_academique)) {
+      return res.status(400).json({ error: 'Année académique invalide (format: 2024-2025).' });
+    }
+    
     const existant = await getOne(`
       SELECT id FROM enrollments
       WHERE etudiant_id = $1 AND professeur_id = $2 AND semestre = $3 AND annee_academique = $4`,
-      [etudiant_id, professeur_id, semestre, annee_academique]);
+      [etuId, profId, semestre, annee_academique]);
     if (existant) return res.status(409).json({ error: 'Inscription déjà existante.' });
     await runQuery(`
       INSERT INTO enrollments (etudiant_id, professeur_id, semestre, annee_academique)
-      VALUES ($1, $2, $3, $4)`, [etudiant_id, professeur_id, semestre, annee_academique]);
+      VALUES ($1, $2, $3, $4)`, [etuId, profId, semestre, annee_academique]);
     res.json({ message: 'Étudiant inscrit avec succès.' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });
@@ -195,6 +264,58 @@ router.put('/codes/:id/toggle', async (req, res) => {
     await runQuery(`UPDATE codes_inscription SET actif = $1 WHERE id = $2`, [c.actif ? 0 : 1, req.params.id]);
     res.json({ message: 'Statut mis à jour.' });
   } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+router.get('/commentaires', async (req, res) => {
+  try {
+    const { semestre, annee_academique } = req.query;
+    const semestreFilter = semestre || 'S2';
+    const anneeFilter = annee_academique || '2025-2026';
+    
+    const commentaires = await getAll(`
+      SELECT 
+        e.commentaire,
+        e.created_at,
+        e.note_clarte, e.note_maitrise, e.note_disponibilite, e.note_supports, e.note_ponctualite, e.note_engagement,
+        u.nom AS prof_nom, u.prenom AS prof_prenom,
+        p.matiere
+      FROM evaluations e
+      JOIN professeurs p ON e.professeur_id = p.id
+      JOIN users u ON p.user_id = u.id
+      WHERE e.commentaire IS NOT NULL 
+        AND e.commentaire != ''
+        AND e.semestre = $1 
+        AND e.annee_academique = $2
+      ORDER BY e.created_at DESC
+      LIMIT 100
+    `, [semestreFilter, anneeFilter]);
+    
+    res.json({ commentaires });
+  } catch (err) {
+    console.error('Erreur GET commentaires:', err.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+router.delete('/codes/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: 'Identifiant invalide.' });
+    }
+    const row = await getOne(`SELECT id, code FROM codes_inscription WHERE id = $1`, [id]);
+    if (!row) {
+      return res.status(404).json({ error: 'Code introuvable.' });
+    }
+    if (row.code === 'EVAL_STATUS') {
+      return res.status(400).json({ error: 'Ce code système ne peut pas être supprimé.' });
+    }
+    await runQuery(`DELETE FROM codes_inscription WHERE id = $1`, [id]);
+    res.json({ message: 'Code supprimé.' });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 });
