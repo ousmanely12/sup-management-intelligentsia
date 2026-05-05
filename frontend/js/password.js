@@ -1,3 +1,5 @@
+const API = window.location.origin + '/api';
+
 function ouvrirModalPassword() {
   document.getElementById('pwd-ancien').value = '';
   document.getElementById('pwd-nouveau').value = '';
@@ -41,7 +43,7 @@ async function changerMotDePasse() {
   }
 
   try {
-    const res = await fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/auth/change-password', {
+    const res = await fetch(`${API}/auth/change-password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

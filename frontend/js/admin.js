@@ -1,3 +1,4 @@
+const API = window.location.origin + '/api';
 const user = requireAuth('admin');
 
 if (user) {
@@ -13,11 +14,7 @@ if (user) {
 }
 
 async function fetchAdmin(url, options = {}) {
-  const base =
-    typeof API !== 'undefined'
-      ? API
-      : `${window.location.origin.replace(/\/$/, '')}/api`;
-  const res = await fetch(`${base}/admin` + url, {
+  const res = await fetch(`${API}/admin` + url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -29,9 +26,7 @@ async function fetchAdmin(url, options = {}) {
 }
 
 function apiBase() {
-  return typeof API !== 'undefined'
-    ? API
-    : `${window.location.origin.replace(/\/$/, '')}/api`;
+  return API;
 }
 
 async function chargerDashboard() {

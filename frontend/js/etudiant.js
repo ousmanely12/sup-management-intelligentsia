@@ -1,3 +1,4 @@
+const API = window.location.origin + '/api';
 const user = requireAuth('etudiant');
 
 let profSelectionne = null;

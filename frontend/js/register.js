@@ -1,3 +1,5 @@
+const API = window.location.origin + '/api';
+
 let profsDisponibles = [];
 let profsSelectionnes = new Set();
 let semestreActuel = 'S2';
@@ -6,8 +8,8 @@ let anneeActuelle = '2025-2026';
 async function chargerProfs() {
   try {
     const [resP, resC] = await Promise.all([
-      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/public/professeurs'),
-      fetch('https://sup-management-intelligentsia-dlw2.onrender.com/api/public/config'),
+      fetch(`${API}/public/professeurs`),
+      fetch(`${API}/public/config`),
     ]);
 
     // Vérifier que la réponse est bien du JSON
@@ -182,7 +184,7 @@ async function soumettre() {
 
   try {
     const res = await fetch(
-      'https://sup-management-intelligentsia-dlw2.onrender.com/api/auth/register-etudiant',
+      `${API}/auth/register-etudiant`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

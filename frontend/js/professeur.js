@@ -1,3 +1,4 @@
+const API = window.location.origin + '/api';
 const user = requireAuth('professeur');
 
 function escHtml(text) {
@@ -17,17 +18,13 @@ if (user) {
 
 async function chargerDashboardProf(semestre = 'S2', annee_academique = '2025-2026') {
   const token = getToken();
-  const base =
-    typeof API !== 'undefined'
-      ? API
-      : `${window.location.origin.replace(/\/$/, '')}/api`;
-  
+
   // Afficher le loading
   const loadingEl = document.getElementById('filter-loading');
   if (loadingEl) loadingEl.style.opacity = '1';
-  
+
   try {
-    const res = await fetch(`${base}/professeur/dashboard?semestre=${semestre}&annee_academique=${annee_academique}`, {
+    const res = await fetch(`${API}/professeur/dashboard?semestre=${semestre}&annee_academique=${annee_academique}`, {
       headers: { Authorization: 'Bearer ' + token },
     });
 
