@@ -1,4 +1,4 @@
-const API = window.location.origin + '/api';
+// API déjà déclarée dans auth.js
 
 let profsDisponibles = [];
 let profsSelectionnes = new Set();

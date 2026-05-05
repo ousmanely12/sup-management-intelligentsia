@@ -1,4 +1,4 @@
-const API = window.location.origin + '/api';
+// API déjà déclarée dans auth.js
 const user = requireAuth('etudiant');
 
 let profSelectionne = null;

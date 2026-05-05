@@ -1,4 +1,4 @@
-const API = window.location.origin + '/api';
+// API déjà déclarée dans auth.js
 
 function ouvrirModalPassword() {
   document.getElementById('pwd-ancien').value = '';
