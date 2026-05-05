@@ -1748,47 +1748,93 @@ tr:hover td {
 }
 /* ── Responsive Mobile ──────────────────────────────────────── */
 @media (max-width: 968px) {
-  /* Navigation */
-  nav {
+  /* Dashboard containers */
+  .dashboard {
+    margin: 1rem auto;
+    padding: 0 1rem;
+    max-width: 100%;
+  }
+
+  .dashboard-title {
+    font-size: 1.35rem;
+  }
+
+  /* Cards */
+  .section-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-card-header {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem 1rem;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
-  .logo-nav {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .logo-nav img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .logo-nav h1 {
-    font-size: 1.5rem;
-  }
-
-  .nav-links {
-    display: flex !important;
-    flex-direction: column;
-    width: 100%;
+  /* Forms */
+  .form-row-2 {
+    grid-template-columns: 1fr;
     gap: 1rem;
-    text-align: center;
   }
 
-  .nav-links a {
-    padding: 0.8rem;
-    font-size: 1rem;
+  .login-card {
+    padding: 1.75rem 1.25rem;
+    max-width: 100%;
   }
 
-  .btn-nav {
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+  .login-header h1 {
+    font-size: 1.15rem;
   }
 
-  /* Hero */
+  /* Tables */
+  .data-table {
+    font-size: 14px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px 6px;
+  }
+
+  /* Charts */
+  .chart-container {
+    height: 300px;
+  }
+}
+
+/* ── Responsive Tablette ─────────────────────────────────────── */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .navbar {
+    padding: 0 1.5rem;
+  }
+
+  .dashboard {
+    margin: 1.5rem auto;
+    padding: 0 1.5rem;
+    max-width: 100%;
+  }
+
+  .section-card-header {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .data-table {
+    font-size: 14px;
+  }
+
+  .prof-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Hero Mobile ─────────────────────────────────────── */
+@media (max-width: 968px) {
   .hero {
     grid-template-columns: 1fr;
     padding: 3rem 1.5rem;
@@ -1959,6 +2005,7 @@ tr:hover td {
   .dashboard {
     margin: 1rem auto;
     padding: 0 1rem;
+    max-width: 100%;
   }
 
   .dashboard-title {
@@ -1973,6 +2020,7 @@ tr:hover td {
 
   .login-card {
     padding: 1.75rem 1.25rem;
+    max-width: 100%;
   }
 
   .login-header h1 {
@@ -2013,6 +2061,43 @@ tr:hover td {
   .prof-grid {
     grid-template-columns: 1fr;
     padding: 1rem;
+    gap: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .data-table {
+    font-size: 13px;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 6px 4px;
+    min-width: 80px;
+  }
+
+  .chart-container {
+    height: 250px;
+    margin: 1rem 0;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-control {
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 }
 
@@ -2020,6 +2105,48 @@ tr:hover td {
   .navbar-right .btn-logout {
     flex: 1 1 100%;
     min-width: 0;
+  }
+
+  .navbar-brand img {
+    max-height: 32px;
+  }
+
+  .dashboard-title {
+    font-size: 1.25rem;
+  }
+
+  .section-card {
+    padding: 1rem;
+  }
+
+  .data-table {
+    font-size: 12px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 4px 2px;
+    min-width: 70px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .chart-container {
+    height: 200px;
+  }
+
+  .modal {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem 0.75rem;
   }
 }
 
