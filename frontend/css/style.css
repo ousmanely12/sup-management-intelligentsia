@@ -281,17 +281,48 @@ body {
 }
 
 .auth-side {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.1rem;
   color: rgba(255, 255, 255, 0.95);
   padding-right: 0.5rem;
 }
 
-@media (min-width: 960px) {
-  .auth-side {
+@media (max-width: 959px) {
+  .auth-wrap {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1.1rem;
+    padding: 1.5rem 1rem;
+  }
+  
+  .auth-side {
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    order: -1;
+  }
+  
+  .auth-side-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .auth-side-text {
+    font-size: 0.9rem;
+    max-width: 100%;
+    line-height: 1.5;
+  }
+  
+  .auth-side-list {
+    display: none;
+  }
+  
+  .auth-panel {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
   }
 }
 
