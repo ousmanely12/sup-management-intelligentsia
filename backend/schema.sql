@@ -80,6 +80,16 @@ CREATE TABLE IF NOT EXISTS parametres (
   description TEXT,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Table des années académiques
+CREATE TABLE IF NOT EXISTS annees_academiques (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  annee TEXT UNIQUE NOT NULL, -- ex: "2025-2026"
+  actif INTEGER DEFAULT 1,
+  semestre_actif TEXT DEFAULT 'S1',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index pour accélérer les requêtes fréquentes
 CREATE INDEX IF NOT EXISTS idx_evaluations_prof ON evaluations(professeur_id);
 CREATE INDEX IF NOT EXISTS idx_enrollments_etudiant ON enrollments(etudiant_id);

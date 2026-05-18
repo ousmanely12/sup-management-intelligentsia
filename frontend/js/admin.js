@@ -616,3 +616,151 @@ async function chargerCommentaires() {
     document.getElementById('admin-comments-list').innerHTML = '<div class="dash-empty">Erreur de chargement.</div>';
   }
 }
+
+// ── Gestion des années académiques ────────────────────────────────────────
+
+async function chargerAnnees() {
+  try {
+    const res = await fetch(`${API}/admin/annees-academiques`, {
+      headers: { Authorization: 'Bearer ' + getToken() }
+    });
+    const data = await res.json();
+    
+    const tbody = document.getElementById('tbody-annees');
+    if (!tbody) return;
+    
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="dash-empty" style="text-align: center">Aucune année académique configurée</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = data.map(a => `
+      <tr>
+        <td><strong>${a.annee}</strong></td>
+        <td><span class="badge badge-bleu">${a.semestre_actif}</span></td>
+        <td>
+          <span class="badge ${a.actif ? 'badge-vert' : 'badge-gris'}">
+            ${a.actif ? 'Actif' : 'Inactif'}
+          </span>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm" onclick="toggleActifAnnee(${a.id}, ${a.actif})">
+            ${a.actif ? 'Désactiver' : 'Activer'}
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="changerSemestreAnnee(${a.id})">
+            Changer semestre
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error('Erreur chargement années:', err);
+    const tbody = document.getElementById('tbody-annees');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="dash-empty" style="text-align: center">Erreur de chargement</td></tr>';
+  }
+}
+
+function ouvrirModalAnnee() {
+  document.getElementById('modal-annee').classList.add('open');
+  document.getElementById('new-annee').value = '';
+  document.getElementById('new-semestre-actif').value = 'S1';
+  document.getElementById('annee-alert-error').classList.remove('show');
+  document.getElementById('annee-alert-success').classList.remove('show');
+}
+
+function fermerModalAnnee() {
+  document.getElementById('modal-annee').classList.remove('open');
+}
+
+async function ajouterAnnee() {
+  const annee = document.getElementById('new-annee').value.trim();
+  const semestreActif = document.getElementById('new-semestre-actif').value;
+  
+  // Validation
+  if (!annee || !/^\d{4}-\d{4}$/.test(annee)) {
+    showAlert('annee-alert-error', 'Format invalide (ex: 2026-2027)');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${API}/admin/annees-academiques`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + getToken()
+      },
+      body: JSON.stringify({ annee, semestre_actif: semestreActif })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      showAlert('annee-alert-error', data.error || 'Erreur lors de l\'ajout');
+      return;
+    }
+    
+    showAlert('annee-alert-success', 'Année académique ajoutée avec succès');
+    fermerModalAnnee();
+    chargerAnnees();
+  } catch (err) {
+    showAlert('annee-alert-error', 'Erreur serveur');
+  }
+}
+
+async function toggleActifAnnee(id, actif) {
+  try {
+    const res = await fetch(`${API}/admin/annees-academiques/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + getToken()
+      },
+      body: JSON.stringify({ actif: !actif })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      alert(data.error || 'Erreur lors de la modification');
+      return;
+    }
+    
+    chargerAnnees();
+  } catch (err) {
+    alert('Erreur serveur');
+  }
+}
+
+async function changerSemestreAnnee(id) {
+  const nouveauSemestre = prompt('Entrez le nouveau semestre (S1 ou S2):');
+  
+  if (!nouveauSemestre || !['S1', 'S2'].includes(nouveauSemestre)) {
+    alert('Semestre invalide');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${API}/admin/annees-academiques/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + getToken()
+      },
+      body: JSON.stringify({ semestre_actif: nouveauSemestre })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      alert(data.error || 'Erreur lors de la modification');
+      return;
+    }
+    
+    chargerAnnees();
+  } catch (err) {
+    alert('Erreur serveur');
+  }
+}
+
+// Charger les années académiques au démarrage
+chargerAnnees();

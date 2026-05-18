@@ -282,6 +282,34 @@
           </table>
         </div>
       </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h2>Années académiques</h2>
+          <button type="button" class="btn btn-orange" onclick="ouvrirModalAnnee()">
+            + Nouvelle année
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Année</th>
+                <th>Semestre actif</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-annees">
+              <tr>
+                <td colspan="4" class="dash-empty" style="text-align: center">
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div class="modal-overlay" id="modal-user">
@@ -413,6 +441,44 @@
             onclick="sauvegarderUser()"
           >
             Sauvegarder
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-annee">
+      <div class="modal" style="max-width: 420px">
+        <div class="modal-header">
+          <h3>Ajouter une année académique</h3>
+          <button type="button" class="modal-close" onclick="fermerModalAnnee()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-error" id="annee-alert-error"></div>
+          <div class="alert alert-success" id="annee-alert-success"></div>
+          <div class="form-group">
+            <label for="new-annee">Année académique</label>
+            <input type="text" id="new-annee" placeholder="2026-2027" />
+            <small style="color: var(--gris-text); font-size: 12px;">Format: AAAA-AAAA (ex: 2026-2027)</small>
+          </div>
+          <div class="form-group">
+            <label for="new-semestre-actif">Semestre actif</label>
+            <select id="new-semestre-actif">
+              <option value="S1">Semestre 1</option>
+              <option value="S2">Semestre 2</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="fermerModalAnnee()">
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            style="width: auto"
+            onclick="ajouterAnnee()"
+          >
+            Ajouter
           </button>
         </div>
       </div>

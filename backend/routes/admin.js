@@ -359,4 +359,148 @@ router.put('/evaluation-status', async (req, res) => {
   }
 });
 
+// ── Routes pour la gestion des années académiques ────────────────────────────────
+
+// GET /api/admin/annees-academiques - Lister toutes les années académiques
+router.get('/annees-academiques', async (req, res) => {
+  try {
+    // S'assurer que la table existe
+    try {
+      await runQuery(`
+        CREATE TABLE IF NOT EXISTS annees_academiques (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          annee TEXT UNIQUE NOT NULL,
+          actif INTEGER DEFAULT 1,
+          semestre_actif TEXT DEFAULT 'S1',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+    } catch (e) {
+      // Ignorer si la table existe déjà
+    }
+
+    const annees = await getAll(`
+      SELECT * FROM annees_academiques 
+      ORDER BY annee DESC
+    `);
+    res.json(annees);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// POST /api/admin/annees-academiques - Ajouter une nouvelle année académique
+router.post('/annees-academiques', async (req, res) => {
+  try {
+    const { annee, semestre_actif } = req.body;
+
+    // Validation
+    if (!annee || !/^\d{4}-\d{4}$/.test(annee)) {
+      return res.status(400).json({ error: 'Année académique invalide (format: 2025-2026).' });
+    }
+
+    if (semestre_actif && !['S1', 'S2'].includes(semestre_actif)) {
+      return res.status(400).json({ error: 'Semestre invalide (S1 ou S2).' });
+    }
+
+    // Vérifier si l'année existe déjà
+    const existant = await getOne(
+      `SELECT id FROM annees_academiques WHERE annee = $1`,
+      [annee]
+    );
+
+    if (existant) {
+      return res.status(409).json({ error: 'Cette année académique existe déjà.' });
+    }
+
+    // Insérer la nouvelle année
+    await runQuery(
+      `INSERT INTO annees_academiques (annee, semestre_actif) VALUES ($1, $2)`,
+      [annee, semestre_actif || 'S1']
+    );
+
+    res.json({ message: 'Année académique ajoutée avec succès.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// PUT /api/admin/annees-academiques/:id - Modifier une année académique
+router.put('/annees-academiques/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const { actif, semestre_actif } = req.body;
+
+    // Validation de l'ID
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID invalide.' });
+    }
+
+    // Validation du semestre
+    if (semestre_actif && !['S1', 'S2'].includes(semestre_actif)) {
+      return res.status(400).json({ error: 'Semestre invalide (S1 ou S2).' });
+    }
+
+    // Construire la requête de mise à jour
+    const updates = [];
+    const values = [];
+
+    if (actif !== undefined) {
+      updates.push('actif = $' + (updates.length + 1));
+      values.push(actif ? 1 : 0);
+    }
+
+    if (semestre_actif) {
+      updates.push('semestre_actif = $' + (updates.length + 1));
+      values.push(semestre_actif);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'Aucune modification à effectuer.' });
+    }
+
+    values.push(id);
+
+    await runQuery(
+      `UPDATE annees_academiques SET ${updates.join(', ')} WHERE id = $${updates.length + 1}`,
+      values
+    );
+
+    res.json({ message: 'Année académique mise à jour avec succès.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
+// DELETE /api/admin/annees-academiques/:id - Supprimer une année académique
+router.delete('/annees-academiques/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+
+    // Validation de l'ID
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID invalide.' });
+    }
+
+    // Vérifier si des données sont liées à cette année
+    const evaluations = await getOne(
+      `SELECT COUNT(*) AS n FROM evaluations WHERE annee_academique = 
+       (SELECT annee FROM annees_academiques WHERE id = $1)`,
+      [id]
+    );
+
+    if (evaluations && evaluations.n > 0) {
+      return res.status(400).json({ 
+        error: 'Impossible de supprimer cette année : des évaluations y sont liées.' 
+      });
+    }
+
+    await runQuery(`DELETE FROM annees_academiques WHERE id = $1`, [id]);
+
+    res.json({ message: 'Année académique supprimée avec succès.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
 module.exports = router;

@@ -18,19 +18,44 @@ router.get('/professeurs', async (req, res) => {
 });
 
 router.get('/config', async (req, res) => {
-  res.json({
-    semestre_actuel: 'S2',
-    annee_academique: '2025-2026',
-    filieres: [
-      'Tronc Commun',
-      'Comptabilité de Gestion',
-      'Management',
-      'Commerce International',
-      'Informatique de Gestion',
-      'Transport & Logistique'
-    ],
-    niveaux: ['Licence 1', 'Licence 2', 'Licence 3']
-  });
+  try {
+    // Récupérer les années académiques actives
+    let anneesActives = [];
+    let anneeActuelle = '2025-2026';
+    let semestreActuel = 'S1';
+
+    try {
+      anneesActives = await getAll(`
+        SELECT annee, semestre_actif FROM annees_academiques 
+        WHERE actif = 1 ORDER BY annee DESC
+      `);
+
+      if (anneesActives.length > 0) {
+        anneeActuelle = anneesActives[0].annee;
+        semestreActuel = anneesActives[0].semestre_actif;
+      }
+    } catch (e) {
+      // Si la table n'existe pas encore, utiliser les valeurs par défaut
+      console.log('Table annees_academiques pas encore créée, valeurs par défaut utilisées');
+    }
+
+    res.json({
+      semestre_actuel: semestreActuel,
+      annee_academique: anneeActuelle,
+      annees_academiques: anneesActives.map(a => a.annee),
+      filieres: [
+        'Tronc Commun',
+        'Comptabilité de Gestion',
+        'Management',
+        'Commerce International',
+        'Informatique de Gestion',
+        'Transport & Logistique'
+      ],
+      niveaux: ['Licence 1', 'Licence 2', 'Licence 3']
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 });
 
 router.get('/statut-evaluations', async (req, res) => {

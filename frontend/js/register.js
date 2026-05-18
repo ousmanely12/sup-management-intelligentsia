@@ -29,6 +29,15 @@ async function chargerProfs() {
     profsDisponibles = dataP.professeurs || [];
     semestreActuel = dataC.semestre_actuel || 'S2';
     anneeActuelle = dataC.annee_academique || '2025-2026';
+    
+    // Récupérer les années académiques disponibles pour le select
+    const anneesDisponibles = dataC.annees_academiques || ['2025-2026'];
+    const selectAnnee = document.getElementById('reg-annee');
+    if (selectAnnee) {
+      selectAnnee.innerHTML = anneesDisponibles.map(annee => 
+        `<option value="${annee}" ${annee === anneeActuelle ? 'selected' : ''}>${annee}</option>`
+      ).join('');
+    }
 
     console.log('Profs chargés:', profsDisponibles.length);
   } catch (err) {

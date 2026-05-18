@@ -173,6 +173,26 @@ router.post('/register-etudiant', async (req, res) => {
       return res.status(400).json({ error: "Code d'inscription requis." });
     }
 
+    // Validation de l'année académique
+    if (!annee_academique || !/^\d{4}-\d{4}$/.test(annee_academique)) {
+      return res.status(400).json({ error: 'Année académique invalide (format: 2025-2026).' });
+    }
+
+    // Vérifier que l'année académique est active
+    try {
+      const anneeActive = await getOne(
+        `SELECT id FROM annees_academiques WHERE annee = $1 AND actif = 1`,
+        [annee_academique]
+      );
+
+      if (!anneeActive) {
+        return res.status(400).json({ error: 'Cette année académique n\'est pas active.' });
+      }
+    } catch (e) {
+      // Si la table n'existe pas encore, autoriser l'inscription
+      console.log('Table annees_academiques pas encore créée, validation ignorée');
+    }
+
     const code = await getOne(
       `SELECT * FROM codes_inscription WHERE code = $1 AND actif = 1`,
       [code_inscription.trim().toUpperCase()]
